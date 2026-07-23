@@ -1,0 +1,68 @@
+# Dependency directories
+node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+.temp/
+.tmp/
+api/node_modules/
+api/dist/
+api/build/
+api/coverage/
+api/.nyc_output/
+api/.temp/
+api/.tmp/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+api/logs/
+api/*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+api/.env
+api/.env.development.local
+api/.env.test.local
+api/.env.production.local
+api/.env.local
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Prisma
+api/src/generated/prisma

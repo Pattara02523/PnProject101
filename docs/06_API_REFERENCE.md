@@ -1,0 +1,121 @@
+# 06 API Reference
+
+# เอกสาร API และ Endpoint Matrix
+
+เอกสารนี้สรุป endpoint จาก SRS ของโปรเจกต์ Investment Portfolio Management System ในรูปแบบตารางเหมือน checklist สำหรับพัฒนาและทดสอบผ่าน Postman
+
+## สถานะ
+
+- `[implemented]`: มี controller/service แล้วและ build ผ่าน
+- `[planned]`: อยู่ใน SRS/docs แต่ยังไม่ได้เขียนโค้ด
+
+## Current Base URL
+
+```txt
+http://localhost:3000
+```
+
+หมายเหตุ: ตอนนี้ยังไม่ได้ตั้ง global prefix `/api/v1` ดังนั้น endpoint ใช้ตรงจาก controller เช่น `/auth/login`
+
+## API Endpoint Matrix
+
+| Feature | End Point | Module | Controller | Body (application/json) | Authentication | Success Response | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Register | `POST /auth/register` | Auth | Auth | `firstname`, `lastname`, `email`, `password`, `phone?` | Public | `message` | `[implemented]` |
+| Login | `POST /auth/login` | Auth | Auth | `email`, `password` | Public | `access_token`, `user` | `[implemented]` |
+| Get authenticated user | `GET /auth/me` | Auth | Auth | - | Bearer Auth | `user` | `[implemented]` |
+| Get profile | `GET /users/profile` | User | User | - | Bearer Auth | `user` | `[implemented]` |
+| Update profile | `PATCH /users/profile` | User | User | `firstname?`, `lastname?`, `phone?` | Bearer Auth | `user` | `[implemented]` |
+| Change password | `PATCH /users/password` | User | User | `oldPassword`, `newPassword` | Bearer Auth | `message` | `[implemented]` |
+| Upload avatar | `PATCH /users/avatar` | User | User | `avatar` multipart/form-data | Bearer Auth | `avatarUrl` | `[planned]` |
+| Create portfolio | `POST /portfolios` | Portfolio | Portfolio | `name`, `description?`, `color?`, `icon?`, `isFavorite?`, `isDefault?` | Bearer Auth | `portfolio` | `[implemented]` |
+| List portfolios | `GET /portfolios` | Portfolio | Portfolio | - | Bearer Auth | `Portfolio[]` | `[implemented]` |
+| Get portfolio by id | `GET /portfolios/:id` | Portfolio | Portfolio | - | Bearer Auth | `portfolio` | `[implemented]` |
+| Update portfolio | `PATCH /portfolios/:id` | Portfolio | Portfolio | `name?`, `description?`, `color?`, `icon?`, `isFavorite?`, `isDefault?` | Bearer Auth | `portfolio` | `[implemented]` |
+| Delete portfolio | `DELETE /portfolios/:id` | Portfolio | Portfolio | - | Bearer Auth | `message` | `[implemented]` |
+| Create category | `POST /categories` | Category | Category | `name`, `icon?`, `color?`, `description?`, `isDefault?` | Bearer Auth | `category` | `[planned]` |
+| List categories | `GET /categories` | Category | Category | - | Bearer Auth | `Category[]` | `[planned]` |
+| Update category | `PATCH /categories/:id` | Category | Category | `name?`, `icon?`, `color?`, `description?`, `isDefault?` | Bearer Auth | `category` | `[planned]` |
+| Delete category | `DELETE /categories/:id` | Category | Category | - | Bearer Auth | `message` | `[planned]` |
+| Create investment | `POST /investments` | Investment | Investment | `portfolioId`, `categoryId`, `assetName`, `symbol`, `assetType`, `purchasePrice`, `currentPrice`, `quantity`, `averageCost`, `riskLevel`, `investmentDate`, `note?` | Bearer Auth | `investment` | `[planned]` |
+| List investments | `GET /investments` | Investment | Investment | Query: `page?`, `limit?`, `search?`, `portfolioId?`, `categoryId?`, `assetType?`, `riskLevel?`, `status?`, `dateFrom?`, `dateTo?` | Bearer Auth | `Investment[]`, `pagination` | `[planned]` |
+| Get investment by id | `GET /investments/:id` | Investment | Investment | - | Bearer Auth | `investment` | `[planned]` |
+| Update investment | `PATCH /investments/:id` | Investment | Investment | investment fields optional | Bearer Auth | `investment` | `[planned]` |
+| Delete investment | `DELETE /investments/:id` | Investment | Investment | - | Bearer Auth | `message` | `[planned]` |
+| Create transaction | `POST /transactions` | Transaction | Transaction | `investmentId`, `type`, `quantity?`, `price?`, `amount`, `fee?`, `tax?`, `transactionDate`, `note?` | Bearer Auth | `transaction` | `[planned]` |
+| List transactions | `GET /transactions` | Transaction | Transaction | Query: `investmentId?`, `type?`, `dateFrom?`, `dateTo?` | Bearer Auth | `Transaction[]`, `pagination` | `[planned]` |
+| Get transaction by id | `GET /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `transaction` | `[planned]` |
+| Update transaction | `PATCH /transactions/:id` | Transaction | Transaction | transaction fields optional | Bearer Auth | `transaction` | `[planned]` |
+| Delete transaction | `DELETE /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `message` | `[planned]` |
+| Create goal | `POST /goals` | Goal | Goal | `title`, `description?`, `targetAmount`, `currentAmount`, `deadline`, `status?` | Bearer Auth | `goal` | `[planned]` |
+| List goals | `GET /goals` | Goal | Goal | - | Bearer Auth | `Goal[]` | `[planned]` |
+| Get goal by id | `GET /goals/:id` | Goal | Goal | - | Bearer Auth | `goal` | `[planned]` |
+| Update goal | `PATCH /goals/:id` | Goal | Goal | goal fields optional | Bearer Auth | `goal` | `[planned]` |
+| Delete goal | `DELETE /goals/:id` | Goal | Goal | - | Bearer Auth | `message` | `[planned]` |
+| Dashboard summary | `GET /dashboard` | Dashboard | Dashboard | - | Bearer Auth | `summary`, `charts`, `recentTransactions` | `[planned]` |
+| List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[planned]` |
+| Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[planned]` |
+| Delete notification | `DELETE /notifications/:id` | Notification | Notification | - | Bearer Auth | `message` | `[planned]` |
+| List announcements | `GET /announcements` | Announcement | Announcement | - | Public or Bearer Auth | `Announcement[]` | `[planned]` |
+| Get announcement by id | `GET /announcements/:id` | Announcement | Announcement | - | Public or Bearer Auth | `announcement` | `[planned]` |
+| Create announcement | `POST /admin/announcements` | Announcement | Announcement | `title`, `message`, `type`, `imageUrl?`, `isPublished?` | Bearer Auth + Admin | `announcement` | `[planned]` |
+| Update announcement | `PATCH /admin/announcements/:id` | Announcement | Announcement | announcement fields optional | Bearer Auth + Admin | `announcement` | `[planned]` |
+| Delete announcement | `DELETE /admin/announcements/:id` | Announcement | Announcement | - | Bearer Auth + Admin | `message` | `[planned]` |
+| Export portfolio report | `GET /reports/portfolio` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?`, `format` | Bearer Auth | file or `url` | `[planned]` |
+| Export transaction report | `GET /reports/transactions` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?`, `format` | Bearer Auth | file or `url` | `[planned]` |
+| List users | `GET /admin/users` | Admin | Admin | Query: `page?`, `limit?`, `search?`, `status?` | Bearer Auth + Admin | `User[]`, `pagination` | `[planned]` |
+| Get user by id | `GET /admin/users/:id` | Admin | Admin | - | Bearer Auth + Admin | `user` | `[planned]` |
+| Update user status | `PATCH /admin/users/:id/status` | Admin | Admin | `status` | Bearer Auth + Admin | `user` | `[planned]` |
+| Delete user | `DELETE /admin/users/:id` | Admin | Admin | - | Bearer Auth + Admin | `message` | `[planned]` |
+| List activity logs | `GET /admin/activity-logs` | Admin | Admin | Query: `page?`, `limit?`, `userId?`, `action?`, `module?` | Bearer Auth + Admin | `ActivityLog[]`, `pagination` | `[planned]` |
+
+## Auth Request Examples
+
+Register:
+
+```json
+{
+  "firstname": "John",
+  "lastname": "Doe",
+  "email": "john@example.com",
+  "password": "Password123",
+  "phone": "0812345678"
+}
+```
+
+Login:
+
+```json
+{
+  "email": "john@example.com",
+  "password": "Password123"
+}
+```
+
+Get authenticated user:
+
+```txt
+GET /auth/me
+Authorization: Bearer <access_token>
+```
+
+## Module Development Order
+
+ถ้าทำตาม SRS และ roadmap แนะนำเรียงแบบนี้:
+
+```txt
+Auth
+-> User
+-> Portfolio
+-> Category
+-> Investment
+-> Transaction
+-> Dashboard
+-> Goal
+-> Notification
+-> Announcement
+-> Report
+-> Admin
+```
+
+เหตุผลคือ `Portfolio`, `Category`, `Investment`, และ `Transaction` เป็นแกนข้อมูลหลัก ส่วน Dashboard/Report ต้องรอข้อมูลเหล่านี้ก่อนจึงจะคำนวณได้

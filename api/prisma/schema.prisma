@@ -1,0 +1,280 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/database/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ======================================================
+// ENUMS
+// ======================================================
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum AssetType {
+  STOCK
+  ETF
+  FUND
+  CRYPTO
+  GOLD
+  BOND
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum InvestmentStatus {
+  ACTIVE
+  SOLD
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  DIVIDEND
+  DEPOSIT
+  WITHDRAW
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  GOAL
+  INVESTMENT
+  REMINDER
+}
+
+enum ActivityAction {
+  LOGIN
+  LOGOUT
+  REGISTER
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum AnnouncementType {
+  NEWS
+  MAINTENANCE
+  MARKET
+  SYSTEM
+}
+
+// ======================================================
+// USER
+// ======================================================
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+
+  firstname String     @map("first_name")
+  lastname  String     @map("last_name")
+  email     String     @unique
+  phone     String?
+  password  String
+  avatarUrl String?    @map("avatar_url")
+  role      UserRole   @default(USER)
+  status    UserStatus @default(ACTIVE)
+
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz()
+  deletedAt     DateTime?      @map("deleted_at")
+  portfolios    Portfolio[]
+  categories    Category[]
+  goals         Goal[]
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+
+  @@map("users")
+}
+
+// ======================================================
+// PORTFOLIO
+// ======================================================
+
+model Portfolio {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  name        String
+  description String?
+  color       String?
+  icon        String?
+  isFavorite  Boolean      @default(false) @map("is_favorite")
+  isDefault   Boolean      @default(false) @map("is_default")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investments Investment[]
+
+  @@map("portfolios")
+}
+
+// ======================================================
+// CATEGORY
+// ======================================================
+
+model Category {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  name        String
+  icon        String?
+  color       String?
+  description String?
+  isDefault   Boolean      @default(false) @map("is_default")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  investments Investment[]
+
+  @@map("categories")
+}
+
+// ======================================================
+// INVESTMENT
+// ======================================================
+
+model Investment {
+  id             String           @id @default(uuid()) @db.Uuid
+  portfolioId    String           @map("portfolio_id") @db.Uuid
+  categoryId     String           @map("category_id") @db.Uuid
+  assetName      String           @map("asset_name")
+  symbol         String
+  assetType      AssetType        @map("asset_type")
+  purchasePrice  Decimal          @map("purchase_price") @db.Decimal(18, 2)
+  currentPrice   Decimal          @map("current_price") @db.Decimal(18, 2)
+  quantity       Decimal          @db.Decimal(18, 4)
+  averageCost    Decimal          @map("average_cost") @db.Decimal(18, 2)
+  riskLevel      RiskLevel        @map("risk_level")
+  status         InvestmentStatus @default(ACTIVE)
+  investmentDate DateTime         @map("investment_date") @db.Date
+  note           String?
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
+  portfolio      Portfolio        @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  category       Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  transactions Transaction[]
+
+  @@map("investments")
+}
+
+// ======================================================
+// TRANSACTION
+// ======================================================
+
+model Transaction {
+  id              String          @id @default(uuid()) @db.Uuid
+  investmentId    String          @map("investment_id") @db.Uuid
+  type            TransactionType
+  quantity        Decimal?        @db.Decimal(18, 4)
+  price           Decimal?        @db.Decimal(18, 2)
+  amount          Decimal         @db.Decimal(18, 2)
+  fee             Decimal?        @db.Decimal(18, 2)
+  tax             Decimal?        @db.Decimal(18, 2)
+  transactionDate DateTime        @map("transaction_date") @db.Timestamptz()
+  note            String?
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+  investment      Investment      @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+// ======================================================
+// GOAL
+// ======================================================
+
+model Goal {
+  id            String     @id @default(uuid()) @db.Uuid
+  userId        String     @map("user_id") @db.Uuid
+  title         String
+  description   String?
+  targetAmount  Decimal    @map("target_amount") @db.Decimal(18, 2)
+  currentAmount Decimal    @map("current_amount") @db.Decimal(18, 2)
+  deadline      DateTime   @db.Date
+  status        GoalStatus @default(IN_PROGRESS)
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime   @updatedAt @map("updated_at") @db.Timestamptz()
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+}
+
+// ======================================================
+// NOTIFICATION
+// ======================================================
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  title     String
+  message   String
+  type      NotificationType
+  link      String?
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// ======================================================
+// Announcement
+// ======================================================
+
+model Announcement {
+  id          String           @id @default(uuid()) @db.Uuid
+  title       String
+  message     String
+  type        AnnouncementType
+  imageUrl    String?          @map("image_url")
+  isPublished Boolean          @default(true) @map("is_published")
+  publishedAt DateTime         @default(now()) @map("published_at") @db.Timestamptz()
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime         @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("announcements")
+}
+
+// ======================================================
+// ACTIVITY LOG
+// ======================================================
+
+model ActivityLog {
+  id          String         @id @default(uuid()) @db.Uuid
+  userId      String         @map("user_id") @db.Uuid
+  action      ActivityAction
+  module      String
+  entityId    String?        @map("entity_id") @db.Uuid
+  description String?
+  ipAddress   String?        @map("ip_address")
+  browser     String?
+  device      String?
+  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz()
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activity_logs")
+}
