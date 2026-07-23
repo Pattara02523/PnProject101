@@ -10,6 +10,9 @@ import { AccessTokenGuard } from '@/auth/guards/access-token.guard';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
+import { CategoryModule } from './category/category.module';
+import { InvestmentModule } from './investment/investment.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -22,7 +25,10 @@ import { PortfolioModule } from './portfolio/portfolio.module';
     JwtInfraModule,
     AuthModule,
     UserModule,
-    PortfolioModule
+    PortfolioModule,
+    CategoryModule,
+    InvestmentModule,
+    TransactionModule
   ],
   providers: [
     {

@@ -12,7 +12,7 @@
 ## Current Base URL
 
 ```txt
-http://localhost:3000
+http://localhost:8000
 ```
 
 หมายเหตุ: ตอนนี้ยังไม่ได้ตั้ง global prefix `/api/v1` ดังนั้น endpoint ใช้ตรงจาก controller เช่น `/auth/login`
@@ -33,20 +33,20 @@ http://localhost:3000
 | Get portfolio by id | `GET /portfolios/:id` | Portfolio | Portfolio | - | Bearer Auth | `portfolio` | `[implemented]` |
 | Update portfolio | `PATCH /portfolios/:id` | Portfolio | Portfolio | `name?`, `description?`, `color?`, `icon?`, `isFavorite?`, `isDefault?` | Bearer Auth | `portfolio` | `[implemented]` |
 | Delete portfolio | `DELETE /portfolios/:id` | Portfolio | Portfolio | - | Bearer Auth | `message` | `[implemented]` |
-| Create category | `POST /categories` | Category | Category | `name`, `icon?`, `color?`, `description?`, `isDefault?` | Bearer Auth | `category` | `[planned]` |
-| List categories | `GET /categories` | Category | Category | - | Bearer Auth | `Category[]` | `[planned]` |
-| Update category | `PATCH /categories/:id` | Category | Category | `name?`, `icon?`, `color?`, `description?`, `isDefault?` | Bearer Auth | `category` | `[planned]` |
-| Delete category | `DELETE /categories/:id` | Category | Category | - | Bearer Auth | `message` | `[planned]` |
-| Create investment | `POST /investments` | Investment | Investment | `portfolioId`, `categoryId`, `assetName`, `symbol`, `assetType`, `purchasePrice`, `currentPrice`, `quantity`, `averageCost`, `riskLevel`, `investmentDate`, `note?` | Bearer Auth | `investment` | `[planned]` |
-| List investments | `GET /investments` | Investment | Investment | Query: `page?`, `limit?`, `search?`, `portfolioId?`, `categoryId?`, `assetType?`, `riskLevel?`, `status?`, `dateFrom?`, `dateTo?` | Bearer Auth | `Investment[]`, `pagination` | `[planned]` |
-| Get investment by id | `GET /investments/:id` | Investment | Investment | - | Bearer Auth | `investment` | `[planned]` |
-| Update investment | `PATCH /investments/:id` | Investment | Investment | investment fields optional | Bearer Auth | `investment` | `[planned]` |
-| Delete investment | `DELETE /investments/:id` | Investment | Investment | - | Bearer Auth | `message` | `[planned]` |
-| Create transaction | `POST /transactions` | Transaction | Transaction | `investmentId`, `type`, `quantity?`, `price?`, `amount`, `fee?`, `tax?`, `transactionDate`, `note?` | Bearer Auth | `transaction` | `[planned]` |
-| List transactions | `GET /transactions` | Transaction | Transaction | Query: `investmentId?`, `type?`, `dateFrom?`, `dateTo?` | Bearer Auth | `Transaction[]`, `pagination` | `[planned]` |
-| Get transaction by id | `GET /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `transaction` | `[planned]` |
-| Update transaction | `PATCH /transactions/:id` | Transaction | Transaction | transaction fields optional | Bearer Auth | `transaction` | `[planned]` |
-| Delete transaction | `DELETE /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `message` | `[planned]` |
+| Create category | `POST /categories` | Category | Category | `name`, `icon?`, `color?`, `description?`, `isDefault?` | Bearer Auth | `category` | `[implemented]` |
+| List categories | `GET /categories` | Category | Category | - | Bearer Auth | `Category[]` | `[implemented]` |
+| Update category | `PATCH /categories/:id` | Category | Category | `name?`, `icon?`, `color?`, `description?`, `isDefault?` | Bearer Auth | `category` | `[implemented]` |
+| Delete category | `DELETE /categories/:id` | Category | Category | - | Bearer Auth | `message` | `[implemented]` |
+| Create investment | `POST /investments` | Investment | Investment | `portfolioId`, `categoryId`, `assetName`, `symbol`, `assetType`, `purchasePrice`, `currentPrice`, `quantity`, `averageCost`, `riskLevel`, `investmentDate`, `note?` | Bearer Auth | `investment` | `[implemented]` |
+| List investments | `GET /investments` | Investment | Investment | Query: `page?`, `limit?`, `search?`, `portfolioId?`, `categoryId?`, `assetType?`, `riskLevel?`, `status?`, `dateFrom?`, `dateTo?` | Bearer Auth | `Investment[]`, `pagination` | `[implemented]` |
+| Get investment by id | `GET /investments/:id` | Investment | Investment | - | Bearer Auth | `investment` | `[implemented]` |
+| Update investment | `PATCH /investments/:id` | Investment | Investment | investment fields optional | Bearer Auth | `investment` | `[implemented]` |
+| Delete investment | `DELETE /investments/:id` | Investment | Investment | - | Bearer Auth | `message` | `[implemented]` |
+| Create transaction | `POST /transactions` | Transaction | Transaction | `investmentId`, `type`, `quantity?`, `price?`, `amount`, `fee?`, `tax?`, `transactionDate`, `note?` | Bearer Auth | `transaction` | `[implemented]` |
+| List transactions | `GET /transactions` | Transaction | Transaction | Query: `investmentId?`, `type?`, `dateFrom?`, `dateTo?` | Bearer Auth | `Transaction[]`, `pagination` | `[implemented]` |
+| Get transaction by id | `GET /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `transaction` | `[implemented]` |
+| Update transaction | `PATCH /transactions/:id` | Transaction | Transaction | transaction fields optional | Bearer Auth | `transaction` | `[implemented]` |
+| Delete transaction | `DELETE /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `message` | `[implemented]` |
 | Create goal | `POST /goals` | Goal | Goal | `title`, `description?`, `targetAmount`, `currentAmount`, `deadline`, `status?` | Bearer Auth | `goal` | `[planned]` |
 | List goals | `GET /goals` | Goal | Goal | - | Bearer Auth | `Goal[]` | `[planned]` |
 | Get goal by id | `GET /goals/:id` | Goal | Goal | - | Bearer Auth | `goal` | `[planned]` |

@@ -5,13 +5,13 @@
 ## สถานะปัจจุบัน
 
 ```txt
-Auth, User, and Portfolio modules implemented
+Auth, User, Portfolio, Category, Investment, and Transaction modules implemented
 ```
 
 ความคืบหน้าโดยประมาณ:
 
 ```txt
-30%
+55%
 ```
 
 ทำแล้ว:
@@ -20,15 +20,20 @@ Auth, User, and Portfolio modules implemented
 - NestJS backend ใน `api/`
 - Prisma schema
 - initial migration
-- DatabaseModule
-- PrismaService
-- ConfigModule
-- Authentication with JWT and bcrypt
-- User profile and password endpoints
-- Portfolio CRUD with ownership validation
+- DatabaseModule + PrismaService
+- ConfigModule + env validation
+- Infrastructure modules (BcryptService, JwtInfraModule)
+- Global Guard (AccessTokenGuard) + @Public() decorator
+- Authentication (Register, Login, JWT)
+- User module (Profile, Update profile, Change password)
+- Portfolio CRUD with ownership validation and default rule
+- Category CRUD with ownership validation and restrict-delete rule
+- Investment CRUD with ownership chain validation and search/filter/pagination
+- Transaction CRUD with 3-level ownership chain (transaction -> investment -> portfolio -> user)
 
 ยังไม่เสร็จ:
 
+- Goal CRUD
 - Dashboard
 - Notification
 - Announcement
@@ -67,30 +72,30 @@ Auth, User, and Portfolio modules implemented
 - [x] Portfolio ownership
 - [x] Default portfolio rule
 - [x] Favorite portfolio
-- [ ] Category CRUD
-- [ ] Category ownership
-- [ ] Restrict delete category in use
+- [x] Category CRUD
+- [x] Category ownership
+- [x] Restrict delete category in use
 
 ## Phase 4: Investment
 
-- [ ] Investment CRUD
-- [ ] Asset type
-- [ ] Risk level
-- [ ] Investment status
-- [ ] Current price
-- [ ] Category assignment
-- [ ] Pagination
-- [ ] Search / Filter
-- [ ] Sorting
+- [x] Investment CRUD
+- [x] Asset type
+- [x] Risk level
+- [x] Investment status
+- [x] Current price
+- [x] Category assignment
+- [x] Pagination
+- [x] Search / Filter
+- [x] Sorting
 
 ## Phase 5: Transaction
 
-- [ ] BUY
-- [ ] SELL
-- [ ] DIVIDEND
-- [ ] DEPOSIT
-- [ ] WITHDRAW
-- [ ] Transaction history
+- [x] BUY
+- [x] SELL
+- [x] DIVIDEND
+- [x] DEPOSIT
+- [x] WITHDRAW
+- [x] Transaction history
 - [ ] Average cost policy
 
 ## Phase 6: Goal
