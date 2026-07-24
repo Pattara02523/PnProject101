@@ -15,7 +15,6 @@ import { MessageResponseDto } from '@/common/dto/message-response.dto';
 import { UserResponseDto } from '@/user/dto/user-response.dto';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
-import { RolesGuard } from '@/auth/guards/roles.guard';
 
 @Controller('auth')
 export class AuthController {

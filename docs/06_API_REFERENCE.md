@@ -53,6 +53,7 @@ http://localhost:8000
 | Update goal | `PATCH /goals/:id` | Goal | Goal | goal fields optional | Bearer Auth | `goal` | `[implemented]` |
 | Delete goal | `DELETE /goals/:id` | Goal | Goal | - | Bearer Auth | `message` | `[implemented]` |
 | Dashboard summary | `GET /dashboard` | Dashboard | Dashboard | - | Bearer Auth | `summary`, `charts`, `recentTransactions` | `[implemented]` |
+| Create notification (Admin) | `POST /notifications` | Notification | Notification | `userId`, `title`, `message`, `type?` | Bearer Auth + Admin | `notification` | `[implemented]` |
 | List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[implemented]` |
 | Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[implemented]` |
 | Delete notification | `DELETE /notifications/:id` | Notification | Notification | - | Bearer Auth | `message` | `[implemented]` |

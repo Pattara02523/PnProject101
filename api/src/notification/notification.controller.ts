@@ -9,7 +9,9 @@ import {
   Post
 } from '@nestjs/common';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { MessageResponseDto } from '@/common/dto/message-response.dto';
+import { UserRole } from '@/database/generated/prisma/enums';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationResponseDto } from './dto/notification-response.dto';
 import { NotificationService } from './notification.service';
@@ -18,6 +20,8 @@ import { NotificationService } from './notification.service';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
+  // เฉพาะ Admin เท่านั้นที่สามารถสร้างการแจ้งเตือนให้ User ได้ (ตาม Business Rules)
+  @Roles(UserRole.ADMIN)
   @Post()
   async create(
     @Body() dto: CreateNotificationDto
