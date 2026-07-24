@@ -5,13 +5,13 @@
 ## สถานะปัจจุบัน
 
 ```txt
-Auth, User, Portfolio, Category, Investment, and Transaction modules implemented
+Auth, User, Portfolio, Category, Investment, Transaction, and Goal modules implemented
 ```
 
 ความคืบหน้าโดยประมาณ:
 
 ```txt
-55%
+65%
 ```
 
 ทำแล้ว:
@@ -30,6 +30,7 @@ Auth, User, Portfolio, Category, Investment, and Transaction modules implemented
 - Category CRUD with ownership validation and restrict-delete rule
 - Investment CRUD with ownership chain validation and search/filter/pagination
 - Transaction CRUD with 3-level ownership chain (transaction -> investment -> portfolio -> user)
+- Goal CRUD with progress percentage calculation and auto status evaluation
 
 ยังไม่เสร็จ:
 
@@ -100,9 +101,9 @@ Auth, User, Portfolio, Category, Investment, and Transaction modules implemented
 
 ## Phase 6: Goal
 
-- [ ] Goal CRUD
-- [ ] Progress calculation
-- [ ] Goal status
+- [x] Goal CRUD
+- [x] Progress calculation
+- [x] Goal status
 - [ ] Goal notification
 
 ## Phase 7: Dashboard

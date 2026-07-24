@@ -47,11 +47,11 @@ http://localhost:8000
 | Get transaction by id | `GET /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `transaction` | `[implemented]` |
 | Update transaction | `PATCH /transactions/:id` | Transaction | Transaction | transaction fields optional | Bearer Auth | `transaction` | `[implemented]` |
 | Delete transaction | `DELETE /transactions/:id` | Transaction | Transaction | - | Bearer Auth | `message` | `[implemented]` |
-| Create goal | `POST /goals` | Goal | Goal | `title`, `description?`, `targetAmount`, `currentAmount`, `deadline`, `status?` | Bearer Auth | `goal` | `[planned]` |
-| List goals | `GET /goals` | Goal | Goal | - | Bearer Auth | `Goal[]` | `[planned]` |
-| Get goal by id | `GET /goals/:id` | Goal | Goal | - | Bearer Auth | `goal` | `[planned]` |
-| Update goal | `PATCH /goals/:id` | Goal | Goal | goal fields optional | Bearer Auth | `goal` | `[planned]` |
-| Delete goal | `DELETE /goals/:id` | Goal | Goal | - | Bearer Auth | `message` | `[planned]` |
+| Create goal | `POST /goals` | Goal | Goal | `title`, `description?`, `targetAmount`, `currentAmount`, `deadline`, `status?` | Bearer Auth | `goal` | `[implemented]` |
+| List goals | `GET /goals` | Goal | Goal | - | Bearer Auth | `Goal[]` | `[implemented]` |
+| Get goal by id | `GET /goals/:id` | Goal | Goal | - | Bearer Auth | `goal` | `[implemented]` |
+| Update goal | `PATCH /goals/:id` | Goal | Goal | goal fields optional | Bearer Auth | `goal` | `[implemented]` |
+| Delete goal | `DELETE /goals/:id` | Goal | Goal | - | Bearer Auth | `message` | `[implemented]` |
 | Dashboard summary | `GET /dashboard` | Dashboard | Dashboard | - | Bearer Auth | `summary`, `charts`, `recentTransactions` | `[planned]` |
 | List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[planned]` |
 | Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[planned]` |
