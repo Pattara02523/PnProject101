@@ -13,6 +13,7 @@ import { PortfolioModule } from './portfolio/portfolio.module';
 import { CategoryModule } from './category/category.module';
 import { InvestmentModule } from './investment/investment.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { GoalModule } from './goal/goal.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { TransactionModule } from './transaction/transaction.module';
     PortfolioModule,
     CategoryModule,
     InvestmentModule,
-    TransactionModule
+    TransactionModule,
+    GoalModule
   ],
   providers: [
     {
