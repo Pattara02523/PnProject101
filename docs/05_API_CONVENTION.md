@@ -11,7 +11,7 @@ API ใช้ REST บน NestJS และควรออกแบบให้�
 ปัจจุบัน backend run ที่:
 
 ```txt
-http://localhost:3000
+http://localhost:8000
 ```
 
 เป้าหมายของ versioned API:

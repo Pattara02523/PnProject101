@@ -96,7 +96,7 @@ Auth, User, Portfolio, Category, Investment, and Transaction modules implemented
 - [x] DEPOSIT
 - [x] WITHDRAW
 - [x] Transaction history
-- [ ] Average cost policy
+- [x] Average cost policy
 
 ## Phase 6: Goal
 

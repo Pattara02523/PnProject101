@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { InvestmentStatus, TransactionType } from '@/database/generated/prisma/enums';
 import { TransactionWhereInput } from '@/database/generated/prisma/models';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
@@ -20,12 +25,31 @@ export class TransactionService {
     // Verify investment belongs to user via ownership chain: investment -> portfolio -> user
     await this.verifyInvestmentOwnership(userId, dto.investmentId);
 
-    return this.prisma.transaction.create({
+    // If SELL, check if quantity to sell exceeds current investment quantity
+    if (dto.type === TransactionType.SELL && dto.quantity) {
+      const investment = await this.prisma.investment.findUnique({
+        where: { id: dto.investmentId },
+        select: { quantity: true }
+      });
+
+      if (investment && Number(dto.quantity) > Number(investment.quantity)) {
+        throw new BadRequestException(
+          `Cannot sell ${dto.quantity} units. Current holding is only ${investment.quantity} units.`
+        );
+      }
+    }
+
+    const transaction = await this.prisma.transaction.create({
       data: {
         ...dto,
         transactionDate: new Date(dto.transactionDate)
       }
     });
+
+    // Auto-recalculate quantity, averageCost, and status on the Investment
+    await this.recalculateInvestmentSummary(dto.investmentId);
+
+    return transaction;
   }
 
   async findAll(
@@ -43,7 +67,6 @@ export class TransactionService {
 
     const skip = (page - 1) * limit;
 
-    // Filter transactions by userId through investment -> portfolio ownership chain
     const where: TransactionWhereInput = {
       investment: {
         portfolio: { userId }
@@ -103,9 +126,9 @@ export class TransactionService {
     id: string,
     dto: UpdateTransactionDto
   ): Promise<TransactionResponseDto> {
-    await this.findOne(userId, id);
+    const existing = await this.findOne(userId, id);
 
-    return this.prisma.transaction.update({
+    const updated = await this.prisma.transaction.update({
       where: { id },
       data: {
         ...dto,
@@ -114,12 +137,20 @@ export class TransactionService {
         })
       }
     });
+
+    // Auto-recalculate quantity, averageCost, and status on the Investment
+    await this.recalculateInvestmentSummary(existing.investmentId);
+
+    return updated;
   }
 
   async delete(userId: string, id: string): Promise<void> {
-    await this.findOne(userId, id);
+    const existing = await this.findOne(userId, id);
 
     await this.prisma.transaction.delete({ where: { id } });
+
+    // Auto-recalculate quantity, averageCost, and status on the Investment
+    await this.recalculateInvestmentSummary(existing.investmentId);
   }
 
   // ── Private helpers ────────────────────────────────────────────
@@ -139,5 +170,51 @@ export class TransactionService {
     if (!investment) {
       throw new NotFoundException('Investment not found.');
     }
+  }
+
+  /**
+   * Recalculates total quantity, average cost basis (Weighted Average Cost),
+   * and status (ACTIVE / SOLD) for an investment based on all its transactions.
+   */
+  private async recalculateInvestmentSummary(
+    investmentId: string
+  ): Promise<void> {
+    const transactions = await this.prisma.transaction.findMany({
+      where: { investmentId },
+      orderBy: [{ transactionDate: 'asc' }, { createdAt: 'asc' }]
+    });
+
+    let totalQuantity = 0;
+    let currentAvgCost = 0;
+
+    for (const tx of transactions) {
+      const qty = tx.quantity ? Number(tx.quantity) : 0;
+      const price = tx.price ? Number(tx.price) : 0;
+
+      if (tx.type === TransactionType.BUY) {
+        const totalCostBefore = totalQuantity * currentAvgCost;
+        const buyCost = qty * price;
+        totalQuantity += qty;
+        currentAvgCost = totalQuantity > 0 ? (totalCostBefore + buyCost) / totalQuantity : 0;
+      } else if (tx.type === TransactionType.SELL) {
+        totalQuantity = Math.max(0, totalQuantity - qty);
+        if (totalQuantity === 0) {
+          currentAvgCost = 0;
+        }
+        // When selling, average cost per unit remains unchanged for remaining shares
+      }
+    }
+
+    const status =
+      totalQuantity > 0 ? InvestmentStatus.ACTIVE : InvestmentStatus.SOLD;
+
+    await this.prisma.investment.update({
+      where: { id: investmentId },
+      data: {
+        quantity: totalQuantity,
+        averageCost: currentAvgCost,
+        status
+      }
+    });
   }
 }
