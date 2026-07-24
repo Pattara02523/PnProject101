@@ -15,6 +15,8 @@ import { InvestmentModule } from './investment/investment.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { GoalModule } from './goal/goal.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { NotificationController } from './notification/notification.controller';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -32,13 +34,15 @@ import { DashboardModule } from './dashboard/dashboard.module';
     InvestmentModule,
     TransactionModule,
     GoalModule,
-    DashboardModule
+    DashboardModule,
+    NotificationModule
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard
     }
-  ]
+  ],
+  controllers: [NotificationController]
 })
 export class AppModule {}

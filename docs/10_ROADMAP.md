@@ -5,13 +5,13 @@
 ## สถานะปัจจุบัน
 
 ```txt
-Auth, User, Portfolio, Category, Investment, Transaction, Goal, and Dashboard modules implemented
+Auth, User, Portfolio, Category, Investment, Transaction, Goal, Dashboard, and Notification modules implemented
 ```
 
 ความคืบหน้าโดยประมาณ:
 
 ```txt
-75%
+80%
 ```
 
 ทำแล้ว:
@@ -32,6 +32,7 @@ Auth, User, Portfolio, Category, Investment, Transaction, Goal, and Dashboard mo
 - Transaction CRUD with 3-level ownership chain (transaction -> investment -> portfolio -> user)
 - Goal CRUD with progress percentage calculation and auto status evaluation
 - Dashboard real-time summary calculation (portfolio value, total capital, profit/loss, ROI, asset allocation, goal summary, recent transactions)
+- Notification module (list notifications, mark as read, delete notification)
 
 ยังไม่เสร็จ:
 
@@ -120,10 +121,10 @@ Auth, User, Portfolio, Category, Investment, Transaction, Goal, and Dashboard mo
 
 ## Phase 8: Notification และ Announcement
 
-- [ ] Notification list
-- [ ] Mark as read
-- [ ] Reminder notification
-- [ ] Announcement list
+- [x] Notification history
+- [x] Mark as read
+- [ ] Announcement CRUD (Admin)
+- [ ] Public announcements (User)
 - [ ] Announcement detail
 - [ ] Admin announcement CRUD
 

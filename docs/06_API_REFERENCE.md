@@ -53,9 +53,9 @@ http://localhost:8000
 | Update goal | `PATCH /goals/:id` | Goal | Goal | goal fields optional | Bearer Auth | `goal` | `[implemented]` |
 | Delete goal | `DELETE /goals/:id` | Goal | Goal | - | Bearer Auth | `message` | `[implemented]` |
 | Dashboard summary | `GET /dashboard` | Dashboard | Dashboard | - | Bearer Auth | `summary`, `charts`, `recentTransactions` | `[implemented]` |
-| List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[planned]` |
-| Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[planned]` |
-| Delete notification | `DELETE /notifications/:id` | Notification | Notification | - | Bearer Auth | `message` | `[planned]` |
+| List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[implemented]` |
+| Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[implemented]` |
+| Delete notification | `DELETE /notifications/:id` | Notification | Notification | - | Bearer Auth | `message` | `[implemented]` |
 | List announcements | `GET /announcements` | Announcement | Announcement | - | Public or Bearer Auth | `Announcement[]` | `[planned]` |
 | Get announcement by id | `GET /announcements/:id` | Announcement | Announcement | - | Public or Bearer Auth | `announcement` | `[planned]` |
 | Create announcement | `POST /admin/announcements` | Announcement | Announcement | `title`, `message`, `type`, `imageUrl?`, `isPublished?` | Bearer Auth + Admin | `announcement` | `[planned]` |
