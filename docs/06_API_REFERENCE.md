@@ -52,7 +52,7 @@ http://localhost:8000
 | Get goal by id | `GET /goals/:id` | Goal | Goal | - | Bearer Auth | `goal` | `[implemented]` |
 | Update goal | `PATCH /goals/:id` | Goal | Goal | goal fields optional | Bearer Auth | `goal` | `[implemented]` |
 | Delete goal | `DELETE /goals/:id` | Goal | Goal | - | Bearer Auth | `message` | `[implemented]` |
-| Dashboard summary | `GET /dashboard` | Dashboard | Dashboard | - | Bearer Auth | `summary`, `charts`, `recentTransactions` | `[planned]` |
+| Dashboard summary | `GET /dashboard` | Dashboard | Dashboard | - | Bearer Auth | `summary`, `charts`, `recentTransactions` | `[implemented]` |
 | List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[planned]` |
 | Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[planned]` |
 | Delete notification | `DELETE /notifications/:id` | Notification | Notification | - | Bearer Auth | `message` | `[planned]` |

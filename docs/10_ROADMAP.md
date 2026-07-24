@@ -5,13 +5,13 @@
 ## สถานะปัจจุบัน
 
 ```txt
-Auth, User, Portfolio, Category, Investment, Transaction, and Goal modules implemented
+Auth, User, Portfolio, Category, Investment, Transaction, Goal, and Dashboard modules implemented
 ```
 
 ความคืบหน้าโดยประมาณ:
 
 ```txt
-65%
+75%
 ```
 
 ทำแล้ว:
@@ -31,6 +31,7 @@ Auth, User, Portfolio, Category, Investment, Transaction, and Goal modules imple
 - Investment CRUD with ownership chain validation and search/filter/pagination
 - Transaction CRUD with 3-level ownership chain (transaction -> investment -> portfolio -> user)
 - Goal CRUD with progress percentage calculation and auto status evaluation
+- Dashboard real-time summary calculation (portfolio value, total capital, profit/loss, ROI, asset allocation, goal summary, recent transactions)
 
 ยังไม่เสร็จ:
 
@@ -108,14 +109,14 @@ Auth, User, Portfolio, Category, Investment, Transaction, and Goal modules imple
 
 ## Phase 7: Dashboard
 
-- [ ] Total portfolio value
-- [ ] Total investment amount
-- [ ] Profit/Loss
-- [ ] ROI
-- [ ] Asset allocation
+- [x] Total portfolio value
+- [x] Total investment amount
+- [x] Profit/Loss
+- [x] ROI
+- [x] Asset allocation
 - [ ] Portfolio growth chart data
 - [ ] Monthly investment chart data
-- [ ] Recent transactions
+- [x] Recent transactions
 
 ## Phase 8: Notification และ Announcement
 
