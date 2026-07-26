@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InvestmentWhereInput } from '@/database/generated/prisma/models';
+import { TransactionType } from '@/database/generated/prisma/enums';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateInvestmentDto } from './dto/create-investment.dto';
 import { UpdateInvestmentDto } from './dto/update-investment.dto';
@@ -23,11 +24,29 @@ export class InvestmentService {
     // ตรวจว่าหมวดหมู่เป็นของผู้ใช้คนปัจจุบัน
     await this.verifyCategoryOwnership(userId, dto.categoryId);
 
-    return this.prisma.investment.create({
-      data: {
-        ...dto,
-        investmentDate: new Date(dto.investmentDate)
+    return this.prisma.$transaction(async (tx) => {
+      const investment = await tx.investment.create({
+        data: {
+          ...dto,
+          investmentDate: new Date(dto.investmentDate)
+        }
+      });
+
+      if (Number(dto.quantity) > 0) {
+        await tx.transaction.create({
+          data: {
+            investmentId: investment.id,
+            type: TransactionType.BUY,
+            quantity: dto.quantity,
+            price: dto.purchasePrice,
+            amount: Number(dto.quantity) * Number(dto.purchasePrice),
+            transactionDate: new Date(dto.investmentDate),
+            note: 'รายการซื้อเริ่มต้น'
+          }
+        });
       }
+
+      return investment;
     });
   }
 
