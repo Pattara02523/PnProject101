@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException
+} from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -23,10 +27,7 @@ export class CategoryService {
   async findAll(userId: string): Promise<CategoryResponseDto[]> {
     return this.prisma.category.findMany({
       where: { userId },
-      orderBy: [
-        { isDefault: 'desc' },
-        { name: 'asc' }
-      ]
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }]
     });
   }
 
@@ -36,7 +37,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new NotFoundException('Category not found.');
+      throw new NotFoundException('ไม่พบหมวดหมู่');
     }
 
     return category;
@@ -58,7 +59,7 @@ export class CategoryService {
   async delete(userId: string, id: string): Promise<void> {
     await this.findOne(userId, id);
 
-    // Business Rule Check: Cannot delete category if still used by investments
+    // ห้ามลบหมวดหมู่ที่ยังถูกใช้งานโดยรายการลงทุน
     const inUse = await this.prisma.investment.findFirst({
       where: { categoryId: id },
       select: { id: true }
@@ -66,7 +67,7 @@ export class CategoryService {
 
     if (inUse) {
       throw new BadRequestException(
-        'Cannot delete category because it is in use by investments.'
+        'ไม่สามารถลบหมวดหมู่นี้ได้ เพราะยังถูกใช้งานโดยรายการลงทุน'
       );
     }
 

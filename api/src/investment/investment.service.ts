@@ -17,10 +17,10 @@ export class InvestmentService {
     userId: string,
     dto: CreateInvestmentDto
   ): Promise<InvestmentResponseDto> {
-    // Verify portfolio belongs to user
+    // ตรวจว่าพอร์ตการลงทุนเป็นของผู้ใช้คนปัจจุบัน
     await this.verifyPortfolioOwnership(userId, dto.portfolioId);
 
-    // Verify category belongs to user
+    // ตรวจว่าหมวดหมู่เป็นของผู้ใช้คนปัจจุบัน
     await this.verifyCategoryOwnership(userId, dto.categoryId);
 
     return this.prisma.investment.create({
@@ -50,7 +50,7 @@ export class InvestmentService {
 
     const skip = (page - 1) * limit;
 
-    // Filter investments by userId through portfolio relation
+    // กรองให้เหลือเฉพาะรายการลงทุนในพอร์ตของผู้ใช้
     const where: InvestmentWhereInput = {
       portfolio: { userId },
       ...(portfolioId && { portfolioId }),
@@ -104,7 +104,7 @@ export class InvestmentService {
     });
 
     if (!investment) {
-      throw new NotFoundException('Investment not found.');
+      throw new NotFoundException('ไม่พบรายการลงทุน');
     }
 
     return investment;
@@ -117,12 +117,12 @@ export class InvestmentService {
   ): Promise<InvestmentResponseDto> {
     await this.findOne(userId, id);
 
-    // If changing portfolio, verify new portfolio belongs to user
+    // เมื่อต้องย้ายพอร์ต ต้องตรวจว่าพอร์ตปลายทางเป็นของผู้ใช้
     if (dto.portfolioId) {
       await this.verifyPortfolioOwnership(userId, dto.portfolioId);
     }
 
-    // If changing category, verify new category belongs to user
+    // เมื่อเปลี่ยนหมวดหมู่ ต้องตรวจว่าหมวดหมู่เป็นของผู้ใช้
     if (dto.categoryId) {
       await this.verifyCategoryOwnership(userId, dto.categoryId);
     }
@@ -144,7 +144,7 @@ export class InvestmentService {
     await this.prisma.investment.delete({ where: { id } });
   }
 
-  // ── Private helpers ────────────────────────────────────────────
+  // เมธอดช่วยตรวจสอบความเป็นเจ้าของข้อมูล
 
   private async verifyPortfolioOwnership(
     userId: string,
@@ -156,7 +156,7 @@ export class InvestmentService {
     });
 
     if (!portfolio) {
-      throw new NotFoundException('Portfolio not found.');
+      throw new NotFoundException('ไม่พบพอร์ตการลงทุน');
     }
   }
 
@@ -170,7 +170,7 @@ export class InvestmentService {
     });
 
     if (!category) {
-      throw new NotFoundException('Category not found.');
+      throw new NotFoundException('ไม่พบหมวดหมู่');
     }
   }
 }

@@ -26,7 +26,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException('ไม่พบผู้ใช้');
     }
 
     return user;
@@ -55,7 +55,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException('ไม่พบผู้ใช้');
     }
 
     const isPasswordMatched = await this.bcryptService.compare(
@@ -64,7 +64,7 @@ export class UserService {
     );
 
     if (!isPasswordMatched) {
-      throw new UnauthorizedException('Old password is incorrect.');
+      throw new UnauthorizedException('รหัสผ่านเดิมไม่ถูกต้อง');
     }
 
     const hashedPassword = await this.bcryptService.hash(dto.newPassword);
@@ -83,7 +83,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException('ไม่พบผู้ใช้');
     }
   }
 

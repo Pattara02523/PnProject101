@@ -10,10 +10,7 @@ import {
   Min
 } from 'class-validator';
 
-import {
-  AssetType,
-  RiskLevel
-} from '@/database/generated/prisma/enums';
+import { AssetType, RiskLevel } from '@/database/generated/prisma/enums';
 import { Trim } from '@/common/decorators/trim.decorator';
 
 export class CreateInvestmentDto {

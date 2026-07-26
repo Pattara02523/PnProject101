@@ -2,7 +2,6 @@ import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -20,7 +19,7 @@ export class CreateTransactionDto {
   @IsEnum(TransactionType)
   type: TransactionType;
 
-  // Required for BUY / SELL, optional for DIVIDEND / DEPOSIT / WITHDRAW
+  // BUY และ SELL ต้องส่งค่า ส่วนประเภทอื่นไม่จำเป็นต้องส่ง
   @IsOptional()
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 4 })
@@ -33,7 +32,7 @@ export class CreateTransactionDto {
   @Min(0)
   price?: number;
 
-  // Always required — the total monetary value of the transaction
+  // จำนวนเงินรวมของรายการ เป็นข้อมูลที่ต้องส่งเสมอ
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)

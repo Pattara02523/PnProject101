@@ -84,7 +84,10 @@ Profile:
 - amount ต้องมากกว่า 0
 - `BUY` และ `SELL` ควรมี quantity และ price
 - `DIVIDEND`, `DEPOSIT`, `WITHDRAW` อาจใช้ amount เป็นหลัก
-- Transaction เป็นประวัติทางการเงิน ควรหลีกเลี่ยงการลบ/แก้ย้อนหลังโดยไม่มี policy
+- `BUY` และ `SELL` ต้องมี quantity และ price มากกว่า 0
+- ห้ามบันทึกหรือแก้ `SELL` จนทำให้จำนวนคงเหลือติดลบ
+- ทุกการสร้าง แก้ไข และลบ transaction ต้องคำนวณ quantity, average cost และ status ของ investment ใหม่ใน database transaction เดียวกัน
+- การคำนวณใช้ลำดับ `transactionDate` แล้วตามด้วย `createdAt`; `BUY` ปรับต้นทุนเฉลี่ยแบบถ่วงน้ำหนัก ส่วน `SELL` ไม่เปลี่ยนต้นทุนเฉลี่ย
 
 ## Goal
 
@@ -153,7 +156,11 @@ Notification เป็นข้อมูลส่วนตัวของ user
 - User export report ได้เฉพาะข้อมูลของตัวเอง
 - Report ต้องคำนวณจากข้อมูลจริง
 - ต้องไม่เปิดเผยข้อมูลของ user อื่น
-- ตอนนี้ยังเป็น planned feature
+- CSV portfolio และ transaction report รองรับ `portfolioId?`, `dateFrom?`, `dateTo?`
+- เมื่อระบุ `portfolioId` ต้องเป็นพอร์ตของผู้ใช้ปัจจุบัน มิฉะนั้นตอบ `404`
+- ช่วงวันรวมวันเริ่มต้นและวันสิ้นสุดทั้งหมดตามเวลา UTC
+- CSV มี UTF-8 BOM เพื่อเปิดด้วย Excel ได้ถูกต้อง
+- PDF export ยังเป็นงานลำดับถัดไป
 
 ## Ownership
 

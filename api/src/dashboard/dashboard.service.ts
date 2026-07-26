@@ -3,7 +3,7 @@ import {
   DashboardResponseDto,
   RecentTransactionDto
 } from '@/dashboard/dto/dashboard-response.dto';
-import { InvestmentStatus } from '@/database/generated/prisma/enums';
+import { AssetType, InvestmentStatus } from '@/database/generated/prisma/enums';
 import { PrismaService } from '@/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 
@@ -62,7 +62,7 @@ export class DashboardService {
           ? Number(((totalValue / totalPortfolioValue) * 100).toFixed(2))
           : 0;
       return {
-        assetType: assetType as any,
+        assetType: assetType as AssetType,
         totalValue: Number(totalValue.toFixed(2)),
         percentage
       };

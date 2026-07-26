@@ -57,18 +57,22 @@ http://localhost:8000
 | List notifications | `GET /notifications` | Notification | Notification | - | Bearer Auth | `Notification[]` | `[implemented]` |
 | Mark notification as read | `PATCH /notifications/:id/read` | Notification | Notification | - | Bearer Auth | `notification` | `[implemented]` |
 | Delete notification | `DELETE /notifications/:id` | Notification | Notification | - | Bearer Auth | `message` | `[implemented]` |
-| List announcements | `GET /announcements` | Announcement | Announcement | - | Public or Bearer Auth | `Announcement[]` | `[planned]` |
-| Get announcement by id | `GET /announcements/:id` | Announcement | Announcement | - | Public or Bearer Auth | `announcement` | `[planned]` |
-| Create announcement | `POST /admin/announcements` | Announcement | Announcement | `title`, `message`, `type`, `imageUrl?`, `isPublished?` | Bearer Auth + Admin | `announcement` | `[planned]` |
-| Update announcement | `PATCH /admin/announcements/:id` | Announcement | Announcement | announcement fields optional | Bearer Auth + Admin | `announcement` | `[planned]` |
-| Delete announcement | `DELETE /admin/announcements/:id` | Announcement | Announcement | - | Bearer Auth + Admin | `message` | `[planned]` |
-| Export portfolio report | `GET /reports/portfolio` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?`, `format` | Bearer Auth | file or `url` | `[planned]` |
-| Export transaction report | `GET /reports/transactions` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?`, `format` | Bearer Auth | file or `url` | `[planned]` |
-| List users | `GET /admin/users` | Admin | Admin | Query: `page?`, `limit?`, `search?`, `status?` | Bearer Auth + Admin | `User[]`, `pagination` | `[planned]` |
-| Get user by id | `GET /admin/users/:id` | Admin | Admin | - | Bearer Auth + Admin | `user` | `[planned]` |
-| Update user status | `PATCH /admin/users/:id/status` | Admin | Admin | `status` | Bearer Auth + Admin | `user` | `[planned]` |
-| Delete user | `DELETE /admin/users/:id` | Admin | Admin | - | Bearer Auth + Admin | `message` | `[planned]` |
-| List activity logs | `GET /admin/activity-logs` | Admin | Admin | Query: `page?`, `limit?`, `userId?`, `action?`, `module?` | Bearer Auth + Admin | `ActivityLog[]`, `pagination` | `[planned]` |
+| List announcements | `GET /announcements` | Announcement | Announcement | - | Public or Bearer Auth | `Announcement[]` | `[implemented]` |
+| Get announcement by id | `GET /announcements/:id` | Announcement | Announcement | - | Public or Bearer Auth | `announcement` | `[implemented]` |
+| List all announcements (Admin) | `GET /admin/announcements` | Announcement | Announcement | - | Bearer Auth + Admin | `Announcement[]` | `[implemented]` |
+| Create announcement | `POST /admin/announcements` | Announcement | Announcement | `title`, `message`, `type`, `imageUrl?`, `isPublished?` | Bearer Auth + Admin | `announcement` | `[implemented]` |
+| Update announcement | `PATCH /admin/announcements/:id` | Announcement | Announcement | announcement fields optional | Bearer Auth + Admin | `announcement` | `[implemented]` |
+| Delete announcement | `DELETE /admin/announcements/:id` | Announcement | Announcement | - | Bearer Auth + Admin | `message` | `[implemented]` |
+| Export portfolio report | `GET /reports/portfolio` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?` | Bearer Auth | CSV file download | `[implemented]` |
+| Export portfolio report PDF | `GET /reports/portfolio/pdf` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?` | Bearer Auth | PDF file download | `[implemented]` |
+| Export transaction report | `GET /reports/transactions` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?` | Bearer Auth | CSV file download | `[implemented]` |
+| Export transaction report PDF | `GET /reports/transactions/pdf` | Report | Report | Query: `portfolioId?`, `dateFrom?`, `dateTo?` | Bearer Auth | PDF file download | `[implemented]` |
+| Admin Dashboard | `GET /admin/dashboard` | Admin | Admin | - | Bearer Auth + Admin | `summary` | `[implemented]` |
+| List users | `GET /admin/users` | Admin | Admin | Query: `page?`, `limit?`, `search?`, `status?` | Bearer Auth + Admin | `User[]`, `pagination` | `[implemented]` |
+| Get user by id | `GET /admin/users/:id` | Admin | Admin | - | Bearer Auth + Admin | `user` | `[implemented]` |
+| Update user status | `PATCH /admin/users/:id/status` | Admin | Admin | `status` | Bearer Auth + Admin | `user` | `[implemented]` |
+| Delete user | `DELETE /admin/users/:id` | Admin | Admin | - | Bearer Auth + Admin | `message` | `[implemented]` |
+| View activity logs | `GET /admin/activity-logs` | Admin | Admin | Query: `page?`, `limit?`, `userId?`, `action?`, `module?` | Bearer Auth + Admin | `ActivityLog[]`, `pagination` | `[implemented]` |
 
 ## Auth Request Examples
 

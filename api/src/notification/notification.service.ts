@@ -41,7 +41,7 @@ export class NotificationService {
     });
 
     if (!notification) {
-      throw new NotFoundException('Notification not found.');
+      throw new NotFoundException('ไม่พบการแจ้งเตือน');
     }
 
     return notification;

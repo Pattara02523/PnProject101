@@ -17,6 +17,9 @@ import { TransactionModule } from './transaction/transaction.module';
 import { GoalModule } from './goal/goal.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { NotificationModule } from './notification/notification.module';
+import { AnnouncementModule } from './announcement/announcement.module';
+import { ReportModule } from './report/report.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -35,7 +38,10 @@ import { NotificationModule } from './notification/notification.module';
     TransactionModule,
     GoalModule,
     DashboardModule,
-    NotificationModule
+    NotificationModule,
+    AnnouncementModule,
+    ReportModule,
+    AdminModule
   ],
   providers: [
     // 1. AccessTokenGuard: ทำงานก่อน — ตรวจว่า JWT Token ถูกต้องไหม

@@ -19,7 +19,7 @@ export class UpdateProfileDto {
   @IsString()
   @IsNotEmpty()
   @Matches(/^[0-9]{10}$/, {
-    message: 'Phone number must contain exactly 10 digits.'
+    message: 'เบอร์โทรศัพท์ต้องมีตัวเลข 10 หลัก'
   })
   phone?: string;
 }

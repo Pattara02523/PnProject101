@@ -41,7 +41,7 @@ export class AccessTokenGuard implements CanActivate {
     const token = this.extractToken(request.headers.authorization);
 
     if (!token) {
-      throw new UnauthorizedException('Access token is required.');
+      throw new UnauthorizedException('กรุณาส่ง access token');
     }
 
     try {
@@ -56,7 +56,7 @@ export class AccessTokenGuard implements CanActivate {
 
       return true;
     } catch {
-      throw new UnauthorizedException('Invalid or expired access token.');
+      throw new UnauthorizedException('access token ไม่ถูกต้องหรือหมดอายุ');
     }
   }
 

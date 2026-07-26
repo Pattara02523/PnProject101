@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { GoalStatus } from '@/database/generated/prisma/enums';
+import { Goal } from '@/database/generated/prisma/client';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
@@ -62,7 +63,7 @@ export class GoalService {
     });
 
     if (!goal) {
-      throw new NotFoundException('Goal not found.');
+      throw new NotFoundException('ไม่พบเป้าหมายทางการเงิน');
     }
 
     return this.formatGoalResponse(goal);
@@ -132,7 +133,7 @@ export class GoalService {
   /**
    * คำนวณ % ความคืบหน้า (Progress Percentage) และจัดฟอร์แมตข้อมูลส่งออก
    */
-  private formatGoalResponse(goal: any): GoalResponseDto {
+  private formatGoalResponse(goal: Goal): GoalResponseDto {
     const target = Number(goal.targetAmount);
     const current = Number(goal.currentAmount);
 

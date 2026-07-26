@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -60,7 +58,7 @@ export class CategoryController {
   ): Promise<MessageResponseDto> {
     await this.categoryService.delete(userId, id);
     return {
-      message: 'Category deleted successfully'
+      message: 'ลบหมวดหมู่สำเร็จ'
     };
   }
 }

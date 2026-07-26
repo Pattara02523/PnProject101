@@ -20,7 +20,7 @@ import { NotificationService } from './notification.service';
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  // เฉพาะ Admin เท่านั้นที่สามารถสร้างการแจ้งเตือนให้ User ได้ (ตาม Business Rules)
+  // เฉพาะผู้ดูแลระบบเท่านั้นที่สร้างการแจ้งเตือนให้ผู้ใช้ได้
   @Roles(UserRole.ADMIN)
   @Post()
   async create(
@@ -50,6 +50,6 @@ export class NotificationController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MessageResponseDto> {
     await this.notificationService.delete(userId, id);
-    return { message: 'Notification deleted successfully' };
+    return { message: 'ลบการแจ้งเตือนสำเร็จ' };
   }
 }

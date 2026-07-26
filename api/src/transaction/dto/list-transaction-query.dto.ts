@@ -23,7 +23,7 @@ export class ListTransactionQueryDto {
   @Min(1)
   limit?: number = 10;
 
-  // Filter by a specific investment
+  // กรองตามรายการลงทุนที่ระบุ
   @IsOptional()
   @IsUUID()
   investmentId?: string;

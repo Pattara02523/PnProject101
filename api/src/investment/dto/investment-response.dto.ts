@@ -1,5 +1,9 @@
 import { Decimal } from '@/database/generated/prisma/internal/prismaNamespace';
-import { AssetType, InvestmentStatus, RiskLevel } from '@/database/generated/prisma/enums';
+import {
+  AssetType,
+  InvestmentStatus,
+  RiskLevel
+} from '@/database/generated/prisma/enums';
 
 export class InvestmentResponseDto {
   id: string;

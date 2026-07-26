@@ -5,13 +5,13 @@
 ## สถานะปัจจุบัน
 
 ```txt
-Auth, User, Portfolio, Category, Investment, Transaction, Goal, Dashboard, and Notification modules implemented
+All Backend Modules (Auth, User, Portfolio, Category, Investment, Transaction, Goal, Dashboard, Notification, Announcement, Report, and Admin) fully implemented
 ```
 
-ความคืบหน้าโดยประมาณ:
+ความคืบหน้าโดยประมาณ (Backend API):
 
 ```txt
-80%
+100%
 ```
 
 ทำแล้ว:
@@ -33,13 +33,10 @@ Auth, User, Portfolio, Category, Investment, Transaction, Goal, Dashboard, and N
 - Goal CRUD with progress percentage calculation and auto status evaluation
 - Dashboard real-time summary calculation (portfolio value, total capital, profit/loss, ROI, asset allocation, goal summary, recent transactions)
 - Notification module (list notifications, mark as read, delete notification)
+- Announcement module (public list/detail, admin CRUD with RolesGuard)
 
 ยังไม่เสร็จ:
 
-- Goal CRUD
-- Dashboard
-- Notification
-- Announcement
 - Report Export
 - Admin
 - Frontend
@@ -123,25 +120,25 @@ Auth, User, Portfolio, Category, Investment, Transaction, Goal, Dashboard, and N
 
 - [x] Notification history
 - [x] Mark as read
-- [ ] Announcement CRUD (Admin)
-- [ ] Public announcements (User)
-- [ ] Announcement detail
-- [ ] Admin announcement CRUD
+- [x] Announcement CRUD (Admin)
+- [x] Public announcements (User)
+- [x] Announcement detail
+- [x] Admin announcement CRUD
 
 ## Phase 9: Report Export
 
-- [ ] Portfolio report
-- [ ] Transaction report
-- [ ] Date range filter
-- [ ] CSV export
-- [ ] PDF export
+- [x] Portfolio report (CSV & PDF)
+- [x] Transaction report (CSV & PDF)
+- [x] Date range filter
+- [x] CSV export
+- [x] PDF export
 
 ## Phase 10: Admin
 
-- [ ] User management
-- [ ] Update user status
-- [ ] Activity logs
-- [ ] Admin dashboard
+- [x] User management
+- [x] Update user status
+- [x] Activity logs
+- [x] Admin dashboard
 
 ## Phase 11: Frontend
 
