@@ -3,7 +3,7 @@ import {
   DashboardResponseDto,
   RecentTransactionDto
 } from '@/dashboard/dto/dashboard-response.dto';
-import { AssetType, InvestmentStatus } from '@/database/generated/prisma/enums';
+import { AssetType, InvestmentStatus, NotificationType } from '@/database/generated/prisma/enums';
 import { PrismaService } from '@/database/prisma.service';
 import { Injectable } from '@nestjs/common';
 
@@ -27,6 +27,34 @@ export class DashboardService {
         status: InvestmentStatus.ACTIVE
       }
     });
+
+    // Check if any active investment hasn't had price updates for more than 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    for (const inv of activeInvestments) {
+      if (inv.updatedAt < sevenDaysAgo) {
+        const link = `/investments/${inv.id}`;
+        const existingNoti = await this.prisma.notification.findFirst({
+          where: {
+            userId,
+            link,
+            title: { contains: 'Price update warning' }
+          }
+        });
+        if (!existingNoti) {
+          await this.prisma.notification.create({
+            data: {
+              userId,
+              title: 'Price update warning (เตือนการอัปเดตราคา)',
+              message: `Asset "${inv.assetName}" (${inv.symbol}) price has not been updated for over 7 days. (สินทรัพย์ "${inv.assetName}" (${inv.symbol}) ไม่มีการอัปเดตราคามากกว่า 7 วันแล้ว)`,
+              type: NotificationType.INVESTMENT,
+              link
+            }
+          });
+        }
+      }
+    }
 
     // 3. คำนวณสรุปตัวเลขทางการเงิน (Summary Cards)
     let totalPortfolioValue = 0;

@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { BcryptService } from '@/infrastructure/hash/bcrypt.service';
 
-import { UserStatus } from '@/database/generated/prisma/enums';
+import { ActivityAction, UserStatus } from '@/database/generated/prisma/enums';
 import { PrismaService } from '@/database/prisma.service';
 import { UserResponseDto } from '@/user/dto/user-response.dto';
 
@@ -36,7 +36,7 @@ export class AuthService {
 
     const hashedPassword = await this.bcryptService.hash(dto.password);
 
-    await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         firstname: dto.firstname,
         lastname: dto.lastname,
@@ -44,7 +44,16 @@ export class AuthService {
         phone: dto.phone,
         password: hashedPassword
       },
-      select: this.safeUserSelect()
+      select: { id: true }
+    });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        action: ActivityAction.REGISTER,
+        module: 'AUTH',
+        description: 'User registration successful'
+      }
     });
   }
 
@@ -74,6 +83,15 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       role: user.role
+    });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId: user.id,
+        action: ActivityAction.LOGIN,
+        module: 'AUTH',
+        description: 'User login successful'
+      }
     });
 
     return {

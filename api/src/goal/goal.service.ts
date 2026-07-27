@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GoalStatus } from '@/database/generated/prisma/enums';
+import { GoalStatus, NotificationType } from '@/database/generated/prisma/enums';
 import { Goal } from '@/database/generated/prisma/client';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
@@ -38,6 +38,15 @@ export class GoalService {
         status
       }
     });
+
+    await this.checkAndNotifyGoalProgress(
+      this.prisma,
+      userId,
+      goal.id,
+      goal.title,
+      currentAmount,
+      targetAmount
+    );
 
     return this.formatGoalResponse(goal);
   }
@@ -114,6 +123,15 @@ export class GoalService {
       }
     });
 
+    await this.checkAndNotifyGoalProgress(
+      this.prisma,
+      userId,
+      updated.id,
+      updated.title,
+      Number(updated.currentAmount),
+      Number(updated.targetAmount)
+    );
+
     return this.formatGoalResponse(updated);
   }
 
@@ -156,5 +174,57 @@ export class GoalService {
       createdAt: goal.createdAt,
       updatedAt: goal.updatedAt
     };
+  }
+
+  private async checkAndNotifyGoalProgress(
+    prisma: any,
+    userId: string,
+    goalId: string,
+    title: string,
+    currentAmount: number,
+    targetAmount: number
+  ): Promise<void> {
+    const progress = targetAmount > 0 ? currentAmount / targetAmount : 0;
+    const link = `/goals/${goalId}`;
+
+    if (progress >= 1.0) {
+      const existingNoti = await prisma.notification.findFirst({
+        where: {
+          userId,
+          link,
+          title: { contains: 'completed' }
+        }
+      });
+      if (!existingNoti) {
+        await prisma.notification.create({
+          data: {
+            userId,
+            title: 'Goal completed (เป้าหมายสำเร็จแล้ว)',
+            message: `Congratulations! Your financial goal "${title}" has been successfully completed! (ยินดีด้วย! เป้าหมายการเงิน "${title}" ของคุณสำเร็จเรียบร้อยแล้ว!)`,
+            type: NotificationType.GOAL,
+            link
+          }
+        });
+      }
+    } else if (progress >= 0.9) {
+      const existingNoti = await prisma.notification.findFirst({
+        where: {
+          userId,
+          link,
+          title: { contains: 'near completion' }
+        }
+      });
+      if (!existingNoti) {
+        await prisma.notification.create({
+          data: {
+            userId,
+            title: 'Goal near completion (เป้าหมายใกล้สำเร็จ)',
+            message: `Your financial goal "${title}" is ${Math.round(progress * 100)}% complete! (เป้าหมายการเงิน "${title}" ของคุณสำเร็จไปแล้ว ${Math.round(progress * 100)}%!)`,
+            type: NotificationType.GOAL,
+            link
+          }
+        });
+      }
+    }
   }
 }
