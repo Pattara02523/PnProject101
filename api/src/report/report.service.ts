@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException
 } from '@nestjs/common';
+import * as fs from 'fs';
 import PDFDocument from 'pdfkit';
 import { PrismaService } from '@/database/prisma.service';
 import { Prisma } from '@/database/generated/prisma/client';
@@ -286,6 +287,21 @@ export class ReportService {
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
+      let regularFont = 'Helvetica';
+      let boldFont = 'Helvetica-Bold';
+
+      const tahomaPath = 'C:/Windows/Fonts/tahoma.ttf';
+      const tahomaBoldPath = 'C:/Windows/Fonts/tahomabd.ttf';
+
+      if (fs.existsSync(tahomaPath)) {
+        doc.registerFont('ThaiFont', tahomaPath);
+        regularFont = 'ThaiFont';
+      }
+      if (fs.existsSync(tahomaBoldPath)) {
+        doc.registerFont('ThaiFont-Bold', tahomaBoldPath);
+        boldFont = 'ThaiFont-Bold';
+      }
+
       const pageWidth = doc.page.width - 60; // margins 30 each side
       const primaryColor = '#1a56db';
       const headerBg = '#1a56db';
@@ -299,7 +315,7 @@ export class ReportService {
 
       doc
         .fillColor(textLight)
-        .font('Helvetica-Bold')
+        .font(boldFont)
         .fontSize(18)
         .text(title, 30, 18);
 
@@ -312,7 +328,7 @@ export class ReportService {
 
       doc
         .fillColor('#bfdbfe')
-        .font('Helvetica')
+        .font(regularFont)
         .fontSize(9)
         .text(dateRange || 'All dates', 30, 42);
 
@@ -331,7 +347,7 @@ export class ReportService {
         doc.rect(startX, tableTop, w, rowHeight).fill(headerBg);
         doc
           .fillColor(textLight)
-          .font('Helvetica-Bold')
+          .font(boldFont)
           .fontSize(7.5)
           .text(header, startX + 3, tableTop + 5, { width: w - 6, ellipsis: true });
         startX += w;
@@ -354,7 +370,7 @@ export class ReportService {
         row.forEach((cell, colIdx) => {
           doc
             .fillColor(textDark)
-            .font('Helvetica')
+            .font(regularFont)
             .fontSize(7.5)
             .text(cell, x + 3, y + 5, {
               width: colWidths[colIdx] - 6,
@@ -373,7 +389,7 @@ export class ReportService {
             doc.rect(hx, 30, w, rowHeight).fill(headerBg);
             doc
               .fillColor(textLight)
-              .font('Helvetica-Bold')
+              .font(boldFont)
               .fontSize(7.5)
               .text(header, hx + 3, 35, { width: w - 6, ellipsis: true });
             hx += w;
@@ -385,7 +401,7 @@ export class ReportService {
       const footerY = doc.page.height - 30;
       doc
         .fillColor('#6b7280')
-        .font('Helvetica')
+        .font(regularFont)
         .fontSize(8)
         .text(`Total records: ${rows.length}`, 30, footerY)
         .text('Investment Portfolio Management System', 0, footerY, {
