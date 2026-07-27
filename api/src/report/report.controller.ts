@@ -1,10 +1,13 @@
 import { Controller, Get, Query, Res, StreamableFile } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import type { Response } from 'express';
 
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { ReportQueryDto } from './dto/report-query.dto';
 import { ReportService } from './report.service';
 
+@ApiTags('Reports')
+@ApiBearerAuth('JWT-auth')
 @Controller('reports')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
@@ -12,6 +15,9 @@ export class ReportController {
   // ─── CSV ─────────────────────────────────────────────────────────────────
 
   @Get('portfolio')
+  @ApiOperation({ summary: 'Export portfolio report in CSV format (ดาวน์โหลดรายงานพอร์ตในรูปแบบ CSV)' })
+  @ApiResponse({ status: 200, description: 'CSV file returned.', type: StreamableFile })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async exportPortfolioCsv(
     @CurrentUser('sub') userId: string,
     @Query() query: ReportQueryDto,
@@ -23,6 +29,9 @@ export class ReportController {
   }
 
   @Get('transactions')
+  @ApiOperation({ summary: 'Export transactions report in CSV format (ดาวน์โหลดรายงานธุรกรรมในรูปแบบ CSV)' })
+  @ApiResponse({ status: 200, description: 'CSV file returned.', type: StreamableFile })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async exportTransactionCsv(
     @CurrentUser('sub') userId: string,
     @Query() query: ReportQueryDto,
@@ -36,6 +45,9 @@ export class ReportController {
   // ─── PDF ─────────────────────────────────────────────────────────────────
 
   @Get('portfolio/pdf')
+  @ApiOperation({ summary: 'Export portfolio report in PDF format (ดาวน์โหลดรายงานพอร์ตในรูปแบบ PDF)' })
+  @ApiResponse({ status: 200, description: 'PDF file returned.', type: StreamableFile })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async exportPortfolioPdf(
     @CurrentUser('sub') userId: string,
     @Query() query: ReportQueryDto,
@@ -47,6 +59,9 @@ export class ReportController {
   }
 
   @Get('transactions/pdf')
+  @ApiOperation({ summary: 'Export transactions report in PDF format (ดาวน์โหลดรายงานธุรกรรมในรูปแบบ PDF)' })
+  @ApiResponse({ status: 200, description: 'PDF file returned.', type: StreamableFile })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async exportTransactionPdf(
     @CurrentUser('sub') userId: string,
     @Query() query: ReportQueryDto,
