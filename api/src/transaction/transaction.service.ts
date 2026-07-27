@@ -41,7 +41,7 @@ export class TransactionService {
         investment.status === InvestmentStatus.SOLD
       ) {
         throw new BadRequestException(
-          'ไม่สามารถซื้อเพิ่มได้ เพราะรายการลงทุนนี้ถูกขายออกทั้งหมดแล้ว'
+          'Cannot buy more because this investment has already been sold out (ไม่สามารถซื้อเพิ่มได้ เพราะรายการลงทุนนี้ถูกขายออกทั้งหมดแล้ว)'
         );
       }
 
@@ -49,7 +49,7 @@ export class TransactionService {
         // Business Rule: ห้าม SELL ถ้า investment.status = SOLD อยู่แล้ว
         if (investment.status === InvestmentStatus.SOLD) {
           throw new BadRequestException(
-            'ไม่สามารถขายได้ เพราะรายการลงทุนนี้ถูกขายออกทั้งหมดแล้ว'
+            'Cannot sell because this investment has already been sold out (ไม่สามารถขายได้ เพราะรายการลงทุนนี้ถูกขายออกทั้งหมดแล้ว)'
           );
         }
 
@@ -184,7 +184,7 @@ export class TransactionService {
       (!quantity || quantity <= 0 || !price || price <= 0)
     ) {
       throw new BadRequestException(
-        'รายการซื้อและขายต้องระบุจำนวนและราคาที่มากกว่า 0'
+        'Buy and Sell transactions must specify quantity and price greater than 0 (รายการซื้อและขายต้องระบุจำนวนและราคาที่มากกว่า 0)'
       );
     }
   }
@@ -201,7 +201,7 @@ export class TransactionService {
     });
 
     if (!investment) {
-      throw new NotFoundException('ไม่พบรายการลงทุน');
+      throw new NotFoundException('Investment not found (ไม่พบรายการลงทุน)');
     }
 
     return investment;
@@ -220,7 +220,7 @@ export class TransactionService {
     });
 
     if (!investment) {
-      throw new NotFoundException('ไม่พบรายการลงทุน');
+      throw new NotFoundException('Investment not found (ไม่พบรายการลงทุน)');
     }
 
     const availableQuantity =
@@ -228,7 +228,7 @@ export class TransactionService {
 
     if (!quantity || quantity > availableQuantity) {
       throw new BadRequestException(
-        `ไม่สามารถขาย ${quantity ?? 0} หน่วยได้ เพราะถือครองอยู่เพียง ${availableQuantity} หน่วย`
+        `Cannot sell ${quantity ?? 0} units because you only hold ${availableQuantity} units (ไม่สามารถขาย ${quantity ?? 0} หน่วยได้ เพราะถือครองอยู่เพียง ${availableQuantity} หน่วย)`
       );
     }
   }
@@ -274,7 +274,7 @@ export class TransactionService {
         totalQuantity -= quantity;
 
         if (totalQuantity < 0) {
-          throw new BadRequestException('ไม่สามารถขายเกินจำนวนที่ถือครอง');
+          throw new BadRequestException('Cannot sell more than the holding amount (ไม่สามารถขายเกินจำนวนที่ถือครอง)');
         }
 
         if (totalQuantity === 0) {
@@ -304,7 +304,7 @@ export class TransactionService {
     });
 
     if (!transaction) {
-      throw new NotFoundException('ไม่พบรายการธุรกรรม');
+      throw new NotFoundException('Transaction not found (ไม่พบรายการธุรกรรม)');
     }
 
     return transaction;

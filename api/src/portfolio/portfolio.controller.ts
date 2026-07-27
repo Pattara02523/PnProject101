@@ -58,7 +58,7 @@ export class PortfolioController {
   ): Promise<MessageResponseDto> {
     await this.portfolioService.delete(userId, id);
     return {
-      message: 'ลบพอร์ตการลงทุนสำเร็จ'
+      message: 'Portfolio deleted successfully (ลบพอร์ตการลงทุนสำเร็จ)'
     };
   }
 }

@@ -35,7 +35,7 @@ export class UserController {
     await this.userService.changePassword(userId, changePasswordDto);
 
     return {
-      message: 'เปลี่ยนรหัสผ่านสำเร็จ'
+      message: 'Password changed successfully (เปลี่ยนรหัสผ่านสำเร็จ)'
     };
   }
 }

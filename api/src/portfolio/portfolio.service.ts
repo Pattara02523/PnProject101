@@ -44,7 +44,7 @@ export class PortfolioService {
     });
 
     if (!portfolio) {
-      throw new NotFoundException('ไม่พบพอร์ตการลงทุน');
+      throw new NotFoundException('Portfolio not found (ไม่พบพอร์ตการลงทุน)');
     }
 
     return portfolio;
@@ -61,7 +61,7 @@ export class PortfolioService {
       });
 
       if (!portfolio) {
-        throw new NotFoundException('ไม่พบพอร์ตการลงทุน');
+        throw new NotFoundException('Portfolio not found (ไม่พบพอร์ตการลงทุน)');
       }
 
       if (dto.isDefault) {

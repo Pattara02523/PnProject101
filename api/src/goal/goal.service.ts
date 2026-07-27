@@ -63,7 +63,7 @@ export class GoalService {
     });
 
     if (!goal) {
-      throw new NotFoundException('ไม่พบเป้าหมายทางการเงิน');
+      throw new NotFoundException('Financial goal not found (ไม่พบเป้าหมายทางการเงิน)');
     }
 
     return this.formatGoalResponse(goal);

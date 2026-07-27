@@ -57,6 +57,6 @@ export class GoalController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MessageResponseDto> {
     await this.goalService.delete(userId, id);
-    return { message: 'ลบเป้าหมายทางการเงินสำเร็จ' };
+    return { message: 'Financial goal deleted successfully (ลบเป้าหมายทางการเงินสำเร็จ)' };
   }
 }

@@ -50,6 +50,6 @@ export class NotificationController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MessageResponseDto> {
     await this.notificationService.delete(userId, id);
-    return { message: 'ลบการแจ้งเตือนสำเร็จ' };
+    return { message: 'Notification deleted successfully (ลบการแจ้งเตือนสำเร็จ)' };
   }
 }

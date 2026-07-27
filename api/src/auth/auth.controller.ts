@@ -28,7 +28,7 @@ export class AuthController {
     await this.authService.register(registerDto);
 
     return {
-      message: 'สมัครสมาชิกสำเร็จ'
+      message: 'Registration successful (สมัครสมาชิกสำเร็จ)'
     };
   }
 

@@ -427,7 +427,7 @@ export class ReportService {
     });
 
     if (!portfolio) {
-      throw new NotFoundException('ไม่พบพอร์ตการลงทุนที่ระบุ');
+      throw new NotFoundException('Specified portfolio not found (ไม่พบพอร์ตการลงทุนที่ระบุ)');
     }
   }
 
@@ -437,7 +437,7 @@ export class ReportService {
       query.dateTo &&
       new Date(query.dateFrom) > new Date(query.dateTo)
     ) {
-      throw new BadRequestException('dateFrom ต้องไม่มากกว่า dateTo');
+      throw new BadRequestException('dateFrom must not be greater than dateTo (dateFrom ต้องไม่มากกว่า dateTo)');
     }
   }
 

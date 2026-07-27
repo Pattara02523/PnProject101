@@ -58,7 +58,7 @@ export class CategoryController {
   ): Promise<MessageResponseDto> {
     await this.categoryService.delete(userId, id);
     return {
-      message: 'ลบหมวดหมู่สำเร็จ'
+      message: 'Category deleted successfully (ลบหมวดหมู่สำเร็จ)'
     };
   }
 }

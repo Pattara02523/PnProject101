@@ -31,7 +31,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException('อีเมลนี้ถูกใช้งานแล้ว');
+      throw new ConflictException('Email already in use (อีเมลนี้ถูกใช้งานแล้ว)');
     }
 
     const hashedPassword = await this.bcryptService.hash(dto.password);
@@ -58,7 +58,7 @@ export class AuthService {
     });
 
     if (!user || user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      throw new UnauthorizedException('Invalid email or password (อีเมลหรือรหัสผ่านไม่ถูกต้อง)');
     }
 
     const isPasswordMatched = await this.bcryptService.compare(
@@ -67,7 +67,7 @@ export class AuthService {
     );
 
     if (!isPasswordMatched) {
-      throw new UnauthorizedException('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      throw new UnauthorizedException('Invalid email or password (อีเมลหรือรหัสผ่านไม่ถูกต้อง)');
     }
 
     const access_token = await this.jwtService.signAsync({
@@ -100,7 +100,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('ไม่พบผู้ใช้');
+      throw new NotFoundException('User not found (ไม่พบผู้ใช้)');
     }
 
     return user;

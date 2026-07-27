@@ -63,6 +63,6 @@ export class TransactionController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MessageResponseDto> {
     await this.transactionService.delete(userId, id);
-    return { message: 'ลบรายการธุรกรรมสำเร็จ' };
+    return { message: 'Transaction deleted successfully (ลบรายการธุรกรรมสำเร็จ)' };
   }
 }

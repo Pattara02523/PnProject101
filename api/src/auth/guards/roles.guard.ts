@@ -37,7 +37,7 @@ export class RolesGuard implements CanActivate {
     const hasRole = requiredRoles.some((role) => user?.role === role);
 
     if (!hasRole) {
-      throw new ForbiddenException('คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้');
+      throw new ForbiddenException('Forbidden resource (คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้)');
     }
 
     return true;

@@ -72,6 +72,6 @@ export class AnnouncementController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MessageResponseDto> {
     await this.announcementService.delete(id);
-    return { message: 'ลบประกาศสำเร็จ' };
+    return { message: 'Announcement deleted successfully (ลบประกาศสำเร็จ)' };
   }
 }

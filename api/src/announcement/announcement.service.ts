@@ -27,7 +27,7 @@ export class AnnouncementService {
     });
 
     if (!announcement) {
-      throw new NotFoundException('ไม่พบประกาศ');
+      throw new NotFoundException('Announcement not found (ไม่พบประกาศ)');
     }
 
     return announcement;
@@ -90,7 +90,7 @@ export class AnnouncementService {
     });
 
     if (!announcement) {
-      throw new NotFoundException('ไม่พบประกาศ');
+      throw new NotFoundException('Announcement not found (ไม่พบประกาศ)');
     }
 
     return announcement;

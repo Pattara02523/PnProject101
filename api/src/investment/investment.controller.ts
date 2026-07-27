@@ -63,6 +63,6 @@ export class InvestmentController {
     @Param('id', ParseUUIDPipe) id: string
   ): Promise<MessageResponseDto> {
     await this.investmentService.delete(userId, id);
-    return { message: 'ลบรายการลงทุนสำเร็จ' };
+    return { message: 'Investment deleted successfully (ลบรายการลงทุนสำเร็จ)' };
   }
 }

@@ -37,7 +37,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new NotFoundException('ไม่พบหมวดหมู่');
+      throw new NotFoundException('Category not found (ไม่พบหมวดหมู่)');
     }
 
     return category;
@@ -67,7 +67,7 @@ export class CategoryService {
 
     if (inUse) {
       throw new BadRequestException(
-        'ไม่สามารถลบหมวดหมู่นี้ได้ เพราะยังถูกใช้งานโดยรายการลงทุน'
+        'Cannot delete category because it is in use by investments (ไม่สามารถลบหมวดหมู่นี้ได้ เพราะยังถูกใช้งานโดยรายการลงทุน)'
       );
     }
 

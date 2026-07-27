@@ -41,7 +41,7 @@ export class InvestmentService {
             price: dto.purchasePrice,
             amount: Number(dto.quantity) * Number(dto.purchasePrice),
             transactionDate: new Date(dto.investmentDate),
-            note: 'รายการซื้อเริ่มต้น'
+            note: 'Initial Buy Transaction (รายการซื้อเริ่มต้น)'
           }
         });
       }
@@ -123,7 +123,7 @@ export class InvestmentService {
     });
 
     if (!investment) {
-      throw new NotFoundException('ไม่พบรายการลงทุน');
+      throw new NotFoundException('Investment not found (ไม่พบรายการลงทุน)');
     }
 
     return investment;
@@ -175,7 +175,7 @@ export class InvestmentService {
     });
 
     if (!portfolio) {
-      throw new NotFoundException('ไม่พบพอร์ตการลงทุน');
+      throw new NotFoundException('Portfolio not found (ไม่พบพอร์ตการลงทุน)');
     }
   }
 
@@ -189,7 +189,7 @@ export class InvestmentService {
     });
 
     if (!category) {
-      throw new NotFoundException('ไม่พบหมวดหมู่');
+      throw new NotFoundException('Category not found (ไม่พบหมวดหมู่)');
     }
   }
 }
