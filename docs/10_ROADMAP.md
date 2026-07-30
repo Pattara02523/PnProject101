@@ -142,16 +142,22 @@ All Backend Modules (Auth, User, Portfolio, Category, Investment, Transaction, G
 
 ## Phase 11: Frontend
 
-- [ ] Next.js app
-- [ ] Auth pages
-- [ ] Dashboard
-- [ ] Portfolio pages
-- [ ] Investment pages
-- [ ] Transaction pages
-- [ ] Goal pages
-- [ ] Notification pages
-- [ ] Report page
-- [ ] Admin pages
+- [x] Next.js app scaffold in `web/`
+- [x] Route groups: `src/app/(auth)` and `src/app/(main)`
+- [x] Auth page skeletons: login, register, forgot-password
+- [x] Main page skeletons: dashboard, analytics, category, goal, investment, notification, portfolio, profile, reports, settings, transaction
+- [x] Admin page skeletons: admin, admin/activity, admin/reports, admin/settings, admin/users
+- [ ] Font setup
+- [ ] Shared layout for main pages
+- [ ] Auth pages UI
+- [ ] Dashboard UI
+- [ ] Portfolio page UI
+- [ ] Investment page UI
+- [ ] Transaction page UI
+- [ ] Goal page UI
+- [ ] Notification page UI
+- [ ] Report page UI
+- [ ] Admin pages UI
 - [ ] Responsive UI
 - [ ] Dark/Light mode
 - [ ] Loading/Error/Empty states

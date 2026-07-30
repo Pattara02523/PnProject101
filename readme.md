@@ -138,6 +138,7 @@ docs/10_ROADMAP.md
 docs/11_SECURITY_GUIDE.md
 docs/12_AI_CONTEXT.md
 docs/13_CODING_STANDARDS.md
+docs/14_FRONTEND_TODO.md
 ```
 
 Requirements อยู่ใน:
