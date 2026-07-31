@@ -87,7 +87,7 @@ async function seedUserData(userId: string, userIndex: number) {
     },
   });
 
-  // 3. Investments
+  // 3. Investments (dates spread across 2026 for progressive growth from Jan -> Jul)
   const invPTT = await prisma.investment.create({
     data: {
       portfolioId: portThai.id,
@@ -96,13 +96,13 @@ async function seedUserData(userId: string, userIndex: number) {
       symbol: 'PTT',
       assetType: 'STOCK',
       purchasePrice: 32.5,
-      currentPrice: 35.75,
+      currentPrice: 38.0,
       quantity: 2000,
       averageCost: 32.5,
       riskLevel: 'MEDIUM',
       status: 'ACTIVE',
-      investmentDate: new Date('2024-01-15'),
-      note: 'หุ้นปันผลดี',
+      investmentDate: new Date('2026-01-15'),
+      note: 'สะสม ม.ค.',
     },
   });
 
@@ -114,12 +114,13 @@ async function seedUserData(userId: string, userIndex: number) {
       symbol: 'KBANK',
       assetType: 'STOCK',
       purchasePrice: 135.0,
-      currentPrice: 152.0,
-      quantity: 400,
+      currentPrice: 155.0,
+      quantity: 600,
       averageCost: 135.0,
       riskLevel: 'LOW',
       status: 'ACTIVE',
-      investmentDate: new Date('2024-02-01'),
+      investmentDate: new Date('2026-02-10'),
+      note: 'สะสม ก.พ.',
     },
   });
 
@@ -131,12 +132,13 @@ async function seedUserData(userId: string, userIndex: number) {
       symbol: 'AAPL',
       assetType: 'STOCK',
       purchasePrice: 180.0,
-      currentPrice: 215.0,
-      quantity: 30,
+      currentPrice: 225.0,
+      quantity: 50,
       averageCost: 180.0,
       riskLevel: 'LOW',
       status: 'ACTIVE',
-      investmentDate: new Date('2024-02-15'),
+      investmentDate: new Date('2026-03-15'),
+      note: 'สะสม มี.ค.',
     },
   });
 
@@ -148,13 +150,13 @@ async function seedUserData(userId: string, userIndex: number) {
       symbol: 'NVDA',
       assetType: 'STOCK',
       purchasePrice: 110.0,
-      currentPrice: 135.5,
-      quantity: 50,
+      currentPrice: 142.0,
+      quantity: 100,
       averageCost: 110.0,
       riskLevel: 'HIGH',
       status: 'ACTIVE',
-      investmentDate: new Date('2024-03-01'),
-      note: 'หุ้นกลุ่ม AI ชิป',
+      investmentDate: new Date('2026-04-12'),
+      note: 'สะสม เม.ย.',
     },
   });
 
@@ -166,12 +168,13 @@ async function seedUserData(userId: string, userIndex: number) {
       symbol: 'BTC',
       assetType: 'CRYPTO',
       purchasePrice: 2100000,
-      currentPrice: 2450000,
-      quantity: 0.08,
+      currentPrice: 2480000,
+      quantity: 0.12,
       averageCost: 2100000,
       riskLevel: 'HIGH',
       status: 'ACTIVE',
-      investmentDate: new Date('2024-03-10'),
+      investmentDate: new Date('2026-05-18'),
+      note: 'สะสม พ.ค.',
     },
   });
 
@@ -183,16 +186,17 @@ async function seedUserData(userId: string, userIndex: number) {
       symbol: 'ETH',
       assetType: 'CRYPTO',
       purchasePrice: 105000,
-      currentPrice: 128000,
-      quantity: 1.5,
+      currentPrice: 132000,
+      quantity: 2.0,
       averageCost: 105000,
       riskLevel: 'HIGH',
       status: 'ACTIVE',
-      investmentDate: new Date('2024-03-20'),
+      investmentDate: new Date('2026-06-20'),
+      note: 'สะสม มิ.ย.',
     },
   });
 
-  // 4. Transactions
+  // 4. Transactions (spread across 2026)
   await prisma.transaction.createMany({
     data: [
       {
@@ -201,66 +205,62 @@ async function seedUserData(userId: string, userIndex: number) {
         quantity: 2000,
         price: 32.5,
         amount: 65000,
-        transactionDate: new Date('2024-01-15'),
-        note: 'ซื้อเก็บเข้าพอร์ต',
+        transactionDate: new Date('2026-01-15'),
+        note: 'ซื้อเก็บเข้าพอร์ต ม.ค.',
       },
       {
         investmentId: invKBANK.id,
         type: 'BUY',
-        quantity: 400,
+        quantity: 600,
         price: 135.0,
-        amount: 54000,
-        transactionDate: new Date('2024-02-01'),
+        amount: 81000,
+        transactionDate: new Date('2026-02-10'),
+        note: 'ซื้อ ก.พ.',
       },
       {
         investmentId: invAAPL.id,
         type: 'BUY',
-        quantity: 30,
+        quantity: 50,
         price: 180.0,
-        amount: 5400,
-        transactionDate: new Date('2024-02-15'),
+        amount: 9000,
+        transactionDate: new Date('2026-03-15'),
+        note: 'ซื้อ มี.ค.',
       },
       {
         investmentId: invNVDA.id,
         type: 'BUY',
-        quantity: 50,
+        quantity: 100,
         price: 110.0,
-        amount: 5500,
-        transactionDate: new Date('2024-03-01'),
+        amount: 11000,
+        transactionDate: new Date('2026-04-12'),
+        note: 'ซื้อ เม.ย.',
       },
       {
         investmentId: invBTC.id,
         type: 'BUY',
-        quantity: 0.08,
+        quantity: 0.12,
         price: 2100000,
-        amount: 168000,
-        transactionDate: new Date('2024-03-10'),
+        amount: 252000,
+        transactionDate: new Date('2026-05-18'),
+        note: 'ซื้อ พ.ค.',
       },
       {
         investmentId: invETH.id,
         type: 'BUY',
-        quantity: 1.5,
+        quantity: 2.0,
         price: 105000,
-        amount: 157500,
-        transactionDate: new Date('2024-03-20'),
+        amount: 210000,
+        transactionDate: new Date('2026-06-20'),
+        note: 'ซื้อ มิ.ย.',
       },
       {
         investmentId: invPTT.id,
         type: 'DIVIDEND',
         quantity: 2000,
-        price: 1.2,
-        amount: 2400,
-        transactionDate: new Date('2024-04-10'),
-        note: 'ปันผลรอบแรก',
-      },
-      {
-        investmentId: invKBANK.id,
-        type: 'DIVIDEND',
-        quantity: 400,
-        price: 4.0,
-        amount: 1600,
-        transactionDate: new Date('2024-05-15'),
-        note: 'ปันผล KBANK',
+        price: 1.5,
+        amount: 3000,
+        transactionDate: new Date('2026-07-10'),
+        note: 'รับปันผล ก.ค.',
       },
     ],
   });
@@ -304,7 +304,7 @@ async function seedUserData(userId: string, userIndex: number) {
       {
         userId,
         title: 'NVDA พุ่งขึ้น 8%',
-        message: 'ราคา NVIDIA ปรับตัวขึ้น 8% ในคืนนี้ สู่ระดับ $135.50',
+        message: 'ราคา NVIDIA ปรับตัวขึ้น 8% ในคืนนี้ สู่ระดับ $142.00',
         type: 'INVESTMENT',
         isRead: false,
       },
@@ -358,7 +358,7 @@ async function main() {
   await prisma.portfolio.deleteMany();
   await prisma.user.deleteMany();
 
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Seeding database with 2026 progressive timeline...');
 
   const hashedPassword = await bcrypt.hash('12345678', 10);
 
@@ -418,7 +418,7 @@ async function main() {
         phone: `08${i.toString().padStart(8, '0')}`,
         password: hashedPassword,
         role: 'USER',
-        status: i === 9 ? 'SUSPENDED' : 'ACTIVE', // user 09 status SUSPENDED for testing admin view
+        status: i === 9 ? 'SUSPENDED' : 'ACTIVE',
       },
     });
 
@@ -453,9 +453,6 @@ async function main() {
 
   console.log('');
   console.log('🎉 Seed completed successfully!');
-  console.log('   🔑 Admin: admin@mail.com / 12345678');
-  console.log('   📧 User Main: test@mail.com / 12345678');
-  console.log('   📧 Users List: test01@mail.com ... test10@mail.com / 12345678');
 }
 
 main()

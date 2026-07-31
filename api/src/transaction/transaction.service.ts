@@ -102,7 +102,18 @@ export class TransactionService {
         where,
         skip,
         take: limit,
-        orderBy: { transactionDate: 'desc' }
+        orderBy: { transactionDate: 'desc' },
+        include: {
+          investment: {
+            select: {
+              id: true,
+              assetName: true,
+              symbol: true,
+              portfolioId: true,
+              portfolio: { select: { id: true, name: true } }
+            }
+          }
+        }
       }),
       this.prisma.transaction.count({ where })
     ]);
@@ -300,7 +311,18 @@ export class TransactionService {
     id: string
   ): Promise<TransactionResponseDto> {
     const transaction = await prisma.transaction.findFirst({
-      where: { id, investment: { portfolio: { userId } } }
+      where: { id, investment: { portfolio: { userId } } },
+      include: {
+        investment: {
+          select: {
+            id: true,
+            assetName: true,
+            symbol: true,
+            portfolioId: true,
+            portfolio: { select: { id: true, name: true } }
+          }
+        }
+      }
     });
 
     if (!transaction) {

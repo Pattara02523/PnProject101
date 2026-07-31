@@ -7,6 +7,7 @@ import { PrismaService } from '@/database/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryResponseDto } from './dto/category-response.dto';
+import { Prisma } from '@/database/generated/prisma/client';
 
 @Injectable()
 export class CategoryService {
@@ -57,9 +58,10 @@ export class CategoryService {
   }
 
   async delete(userId: string, id: string): Promise<void> {
+    // 1. ตรวจสอบว่ามี Category อยู่ในระบบของ User หรือไม่
     await this.findOne(userId, id);
 
-    // ห้ามลบหมวดหมู่ที่ยังถูกใช้งานโดยรายการลงทุน
+    // 2. ตรวจสอบการใช้งานล่วงหน้าก่อนลบ (Restrict pattern)
     const inUse = await this.prisma.investment.findFirst({
       where: { categoryId: id },
       select: { id: true }
@@ -67,12 +69,25 @@ export class CategoryService {
 
     if (inUse) {
       throw new BadRequestException(
-        'Cannot delete category because it is in use by investments (ไม่สามารถลบหมวดหมู่นี้ได้ เพราะยังถูกใช้งานโดยรายการลงทุน)'
+        'Cannot delete category because it is being used by investments.'
       );
     }
 
-    await this.prisma.category.delete({
-      where: { id }
-    });
+    // 3. ทำการลบโดยมี Try-Catch ป้องกัน Foreign Key Violation (P2003)
+    try {
+      await this.prisma.category.delete({
+        where: { id }
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new BadRequestException(
+          'Cannot delete category because it is being used by investments.'
+        );
+      }
+      throw error;
+    }
   }
 }

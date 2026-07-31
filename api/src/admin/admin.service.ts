@@ -159,7 +159,18 @@ export class AdminService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              email: true,
+              avatarUrl: true
+            }
+          }
+        }
       }),
       this.prisma.activityLog.count({ where })
     ]);
