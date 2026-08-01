@@ -30,6 +30,11 @@ export class PortfolioService {
   async findAll(userId: string): Promise<PortfolioResponseDto[]> {
     return this.prisma.portfolio.findMany({
       where: { userId },
+      include: {
+        _count: {
+          select: { investments: true }
+        }
+      },
       orderBy: [
         { isDefault: 'desc' },
         { isFavorite: 'desc' },

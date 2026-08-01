@@ -9,4 +9,7 @@ export class PortfolioResponseDto {
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
+  _count?: {
+    investments: number;
+  };
 }

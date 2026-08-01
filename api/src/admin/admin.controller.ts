@@ -6,12 +6,17 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Query
+  Query,
+  Res,
+  StreamableFile
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { MessageResponseDto } from '@/common/dto/message-response.dto';
 import { UserRole } from '@/database/generated/prisma/enums';
+import { ReportService } from '@/report/report.service';
+import { ReportQueryDto } from '@/report/dto/report-query.dto';
 import { AdminService } from './admin.service';
 import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
@@ -30,7 +35,10 @@ import { AdminDashboardResponseDto } from './dto/admin-dashboard-response.dto';
 @Roles(UserRole.ADMIN)
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly reportService: ReportService
+  ) {}
 
   // ─── Admin Dashboard ───────────────────────────────────────────────────────
 
@@ -92,6 +100,54 @@ export class AdminController {
   ): Promise<MessageResponseDto> {
     await this.adminService.deleteUser(id);
     return { message: 'User deleted successfully (ลบผู้ใช้งานสำเร็จ)' };
+  }
+
+  // ─── Admin User Export (PDF & CSV) ─────────────────────────────────────────
+
+  @Get('users/:userId/export/pdf')
+  @ApiOperation({ summary: 'Admin: Export PDF report of a specific user (ผู้ดูแลดาวน์โหลดรายงาน PDF ของผู้ใช้งาน)' })
+  @ApiResponse({ status: 200, description: 'PDF file returned.', type: StreamableFile })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Admin role required).' })
+  @ApiResponse({ status: 404, description: 'User not found or no investment data.' })
+  async exportUserPdf(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Query() query: ReportQueryDto,
+    @Res({ passthrough: true }) response: Response
+  ): Promise<StreamableFile> {
+    const isTransactions = query.type === 'transactions';
+    const report = isTransactions
+      ? await this.reportService.createTransactionPdf(userId, query)
+      : await this.reportService.createPortfolioPdf(userId, query);
+
+    response.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${report.filename}"`
+    });
+    return new StreamableFile(report.content);
+  }
+
+  @Get('users/:userId/export/csv')
+  @ApiOperation({ summary: 'Admin: Export CSV report of a specific user (ผู้ดูแลดาวน์โหลดรายงาน CSV ของผู้ใช้งาน)' })
+  @ApiResponse({ status: 200, description: 'CSV file returned.', type: StreamableFile })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Admin role required).' })
+  @ApiResponse({ status: 404, description: 'User not found or no investment data.' })
+  async exportUserCsv(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Query() query: ReportQueryDto,
+    @Res({ passthrough: true }) response: Response
+  ): Promise<StreamableFile> {
+    const isTransactions = query.type === 'transactions';
+    const report = isTransactions
+      ? await this.reportService.createTransactionCsv(userId, query)
+      : await this.reportService.createPortfolioCsv(userId, query);
+
+    response.set({
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${report.filename}"`
+    });
+    return new StreamableFile(report.content);
   }
 
   // ─── Activity Logs ─────────────────────────────────────────────────────────

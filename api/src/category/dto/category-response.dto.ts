@@ -8,4 +8,7 @@ export class CategoryResponseDto {
   isDefault: boolean;
   createdAt: Date;
   updatedAt: Date;
+  _count?: {
+    investments: number;
+  };
 }

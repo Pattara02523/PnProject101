@@ -185,7 +185,7 @@ export class GoalService {
     targetAmount: number
   ): Promise<void> {
     const progress = targetAmount > 0 ? currentAmount / targetAmount : 0;
-    const link = `/goals/${goalId}`;
+    const link = `/goal`;
 
     if (progress >= 1.0) {
       const existingNoti = await prisma.notification.findFirst({

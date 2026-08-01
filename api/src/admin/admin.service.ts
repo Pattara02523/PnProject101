@@ -111,14 +111,39 @@ export class AdminService {
   async findOneUser(id: string): Promise<AdminUserResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: this.safeUserSelect()
+      select: {
+        ...this.safeUserSelect(),
+        _count: {
+          select: {
+            portfolios: true,
+            goals: true,
+          }
+        }
+      }
     });
 
     if (!user) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException('User not found (ไม่พบผู้ใช้งานในระบบ)');
     }
 
-    return user as AdminUserResponseDto;
+    const transactionsCount = await this.prisma.transaction.count({
+      where: {
+        investment: {
+          portfolio: {
+            userId: id
+          }
+        }
+      }
+    });
+
+    return {
+      ...user,
+      _count: {
+        portfolios: user._count.portfolios,
+        transactions: transactionsCount,
+        goals: user._count.goals,
+      }
+    } as AdminUserResponseDto;
   }
 
   async updateUserStatus(

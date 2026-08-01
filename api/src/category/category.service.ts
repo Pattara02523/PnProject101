@@ -28,20 +28,30 @@ export class CategoryService {
   async findAll(userId: string): Promise<CategoryResponseDto[]> {
     return this.prisma.category.findMany({
       where: { userId },
+      include: {
+        _count: {
+          select: { investments: true }
+        }
+      },
       orderBy: [{ isDefault: 'desc' }, { name: 'asc' }]
     });
   }
 
   async findOne(userId: string, id: string): Promise<CategoryResponseDto> {
     const category = await this.prisma.category.findFirst({
-      where: { id, userId }
+      where: { id, userId },
+      include: {
+        _count: {
+          select: { investments: true }
+        }
+      }
     });
 
     if (!category) {
       throw new NotFoundException('Category not found (ไม่พบหมวดหมู่)');
     }
 
-    return category;
+    return category as CategoryResponseDto;
   }
 
   async update(

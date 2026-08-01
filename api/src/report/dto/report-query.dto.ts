@@ -1,7 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsUUID } from 'class-validator';
+import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class ReportQueryDto {
+  @ApiPropertyOptional({ example: 'portfolio', description: 'Report type: portfolio or transactions' })
+  @IsOptional()
+  @IsString()
+  type?: string;
+
   @ApiPropertyOptional({ example: 'd4af9a1b-da4f-46f6-a145-1bf1e3220d71', description: 'Filter by Portfolio ID' })
   @IsOptional()
   @IsUUID()

@@ -24,6 +24,7 @@ export class ReportService {
     userId: string,
     query: ReportQueryDto
   ): Promise<FileReport> {
+    await this.ensureUserExists(userId);
     this.validateDateRange(query);
     await this.ensurePortfolioOwnership(userId, query.portfolioId);
 
@@ -44,6 +45,12 @@ export class ReportService {
       },
       orderBy: [{ investmentDate: 'desc' }, { assetName: 'asc' }]
     });
+
+    if (investments.length === 0) {
+      throw new NotFoundException(
+        'No investment data found for this user to export (ไม่พบข้อมูลการลงทุนของผู้ใช้งานท่านนี้เพื่อส่งออก)'
+      );
+    }
 
     const rows = investments.map((investment) => {
       const quantity = Number(investment.quantity);
@@ -88,6 +95,7 @@ export class ReportService {
     userId: string,
     query: ReportQueryDto
   ): Promise<FileReport> {
+    await this.ensureUserExists(userId);
     this.validateDateRange(query);
     await this.ensurePortfolioOwnership(userId, query.portfolioId);
 
@@ -115,6 +123,12 @@ export class ReportService {
       },
       orderBy: [{ transactionDate: 'desc' }, { createdAt: 'desc' }]
     });
+
+    if (transactions.length === 0) {
+      throw new NotFoundException(
+        'No transaction data found for this user to export (ไม่พบข้อมูลธุรกรรมของผู้ใช้งานท่านนี้เพื่อส่งออก)'
+      );
+    }
 
     const rows = transactions.map((transaction) => [
       transaction.investment.portfolio.name,
@@ -150,6 +164,7 @@ export class ReportService {
     userId: string,
     query: ReportQueryDto
   ): Promise<FileReport> {
+    await this.ensureUserExists(userId);
     this.validateDateRange(query);
     await this.ensurePortfolioOwnership(userId, query.portfolioId);
 
@@ -167,6 +182,12 @@ export class ReportService {
       },
       orderBy: [{ investmentDate: 'desc' }, { assetName: 'asc' }]
     });
+
+    if (investments.length === 0) {
+      throw new NotFoundException(
+        'No investment data found for this user to export (ไม่พบข้อมูลการลงทุนของผู้ใช้งานท่านนี้เพื่อส่งออก)'
+      );
+    }
 
     const headers = [
       'Asset', 'Portfolio', 'Category', 'Type', 'Qty',
@@ -215,6 +236,7 @@ export class ReportService {
     userId: string,
     query: ReportQueryDto
   ): Promise<FileReport> {
+    await this.ensureUserExists(userId);
     this.validateDateRange(query);
     await this.ensurePortfolioOwnership(userId, query.portfolioId);
 
@@ -239,6 +261,12 @@ export class ReportService {
       },
       orderBy: [{ transactionDate: 'desc' }, { createdAt: 'desc' }]
     });
+
+    if (transactions.length === 0) {
+      throw new NotFoundException(
+        'No transaction data found for this user to export (ไม่พบข้อมูลธุรกรรมของผู้ใช้งานท่านนี้เพื่อส่งออก)'
+      );
+    }
 
     const headers = ['Portfolio', 'Asset', 'Symbol', 'Type', 'Qty', 'Price', 'Amount', 'Fee', 'Tax', 'Date'];
     const colWidths = [85, 85, 55, 45, 45, 55, 55, 40, 40, 95];
@@ -414,6 +442,17 @@ export class ReportService {
   }
 
   // ─── Shared Helpers ──────────────────────────────────────────────────────────
+
+  private async ensureUserExists(userId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found (ไม่พบผู้ใช้งานในระบบ)');
+    }
+  }
 
   private async ensurePortfolioOwnership(
     userId: string,

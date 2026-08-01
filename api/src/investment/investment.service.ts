@@ -119,6 +119,14 @@ export class InvestmentService {
       where: {
         id,
         portfolio: { userId }
+      },
+      include: {
+        portfolio: {
+          select: { id: true, name: true, color: true }
+        },
+        category: {
+          select: { id: true, name: true, color: true, icon: true }
+        }
       }
     });
 
@@ -126,7 +134,7 @@ export class InvestmentService {
       throw new NotFoundException('Investment not found (ไม่พบรายการลงทุน)');
     }
 
-    return investment;
+    return investment as InvestmentResponseDto;
   }
 
   async update(

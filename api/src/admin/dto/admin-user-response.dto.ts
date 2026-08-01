@@ -11,6 +11,11 @@ export class AdminUserResponseDto {
   status: UserStatus;
   createdAt: Date;
   updatedAt: Date;
+  _count?: {
+    portfolios: number;
+    transactions: number;
+    goals?: number;
+  };
 }
 
 export class PaginatedAdminUserResponseDto {
