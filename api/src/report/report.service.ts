@@ -160,6 +160,8 @@ export class ReportService {
 
   // ─── PDF (Option B — Styled Table) ──────────────────────────────────────────
 
+  // ─── PDF (Executive Financial Report) ──────────────────────────────────────
+
   async createPortfolioPdf(
     userId: string,
     query: ReportQueryDto
@@ -193,7 +195,13 @@ export class ReportService {
       'Asset', 'Portfolio', 'Category', 'Type', 'Qty',
       'Avg Cost', 'Cur Price', 'Cost Val', 'Cur Val', 'P&L', 'ROI%'
     ];
-    const colWidths = [90, 70, 70, 50, 45, 55, 55, 55, 55, 55, 45];
+    const colWidths = [110, 85, 85, 50, 55, 65, 65, 70, 70, 70, 55];
+    const colAlignments: ('left' | 'right' | 'center')[] = [
+      'left', 'left', 'left', 'center', 'right', 'right', 'right', 'right', 'right', 'right', 'right'
+    ];
+
+    let totalCost = 0;
+    let totalCurVal = 0;
 
     const rows = investments.map((inv) => {
       const qty = Number(inv.quantity);
@@ -203,6 +211,10 @@ export class ReportService {
       const curVal = qty * cur;
       const pl = curVal - cost;
       const roi = cost === 0 ? 0 : (pl / cost) * 100;
+
+      totalCost += cost;
+      totalCurVal += curVal;
+
       return [
         inv.assetName,
         inv.portfolio.name,
@@ -213,17 +225,29 @@ export class ReportService {
         this.toNumberString(cur),
         this.toNumberString(cost),
         this.toNumberString(curVal),
-        this.toNumberString(pl),
-        `${this.toNumberString(roi)}%`
+        `${pl >= 0 ? '+' : ''}${this.toNumberString(pl)}`,
+        `${roi >= 0 ? '+' : ''}${this.toNumberString(roi)}%`
       ];
     });
 
+    const totalPL = totalCurVal - totalCost;
+    const totalROI = totalCost === 0 ? 0 : (totalPL / totalCost) * 100;
+
+    const summaryKpis = [
+      { label: 'PORTFOLIO VALUE', value: `THB ${this.toNumberString(totalCurVal)}`, color: '#0f172a' },
+      { label: 'TOTAL COST', value: `THB ${this.toNumberString(totalCost)}`, color: '#475569' },
+      { label: 'NET PROFIT / LOSS', value: `${totalPL >= 0 ? '+' : ''}THB ${this.toNumberString(totalPL)}`, color: totalPL >= 0 ? '#059669' : '#dc2626' },
+      { label: 'OVERALL ROI', value: `${totalROI >= 0 ? '+' : ''}${this.toNumberString(totalROI)}%`, color: totalROI >= 0 ? '#059669' : '#dc2626' }
+    ];
+
     const content = await this.buildPdf(
-      'Portfolio Report',
+      'INVESTMENT PORTFOLIO STATEMENT',
       query,
       headers,
       colWidths,
-      rows
+      colAlignments,
+      rows,
+      summaryKpis
     );
 
     return {
@@ -269,27 +293,48 @@ export class ReportService {
     }
 
     const headers = ['Portfolio', 'Asset', 'Symbol', 'Type', 'Qty', 'Price', 'Amount', 'Fee', 'Tax', 'Date'];
-    const colWidths = [85, 85, 55, 45, 45, 55, 55, 40, 40, 95];
+    const colWidths = [100, 110, 60, 55, 60, 70, 80, 55, 55, 135];
+    const colAlignments: ('left' | 'right' | 'center')[] = [
+      'left', 'left', 'left', 'center', 'right', 'right', 'right', 'right', 'right', 'center'
+    ];
 
-    const rows = transactions.map((t) => [
-      t.investment.portfolio.name,
-      t.investment.assetName,
-      t.investment.symbol,
-      t.type,
-      t.quantity ? this.toNumberString(Number(t.quantity), 4) : '-',
-      t.price ? this.toNumberString(Number(t.price)) : '-',
-      this.toNumberString(Number(t.amount)),
-      t.fee ? this.toNumberString(Number(t.fee)) : '-',
-      t.tax ? this.toNumberString(Number(t.tax)) : '-',
-      this.toDateString(t.transactionDate)
-    ]);
+    let totalAmount = 0;
+    let totalFee = 0;
+
+    const rows = transactions.map((t) => {
+      const amt = Number(t.amount || 0);
+      const fee = Number(t.fee || 0);
+      totalAmount += amt;
+      totalFee += fee;
+
+      return [
+        t.investment.portfolio.name,
+        t.investment.assetName,
+        t.investment.symbol,
+        t.type,
+        t.quantity ? this.toNumberString(Number(t.quantity), 4) : '-',
+        t.price ? this.toNumberString(Number(t.price)) : '-',
+        this.toNumberString(amt),
+        t.fee ? this.toNumberString(fee) : '-',
+        t.tax ? this.toNumberString(Number(t.tax)) : '-',
+        this.toDateString(t.transactionDate)
+      ];
+    });
+
+    const summaryKpis = [
+      { label: 'TOTAL TRANSACTIONS', value: `${transactions.length} Records`, color: '#0f172a' },
+      { label: 'TOTAL TRANSACTION VALUE', value: `THB ${this.toNumberString(totalAmount)}`, color: '#059669' },
+      { label: 'TOTAL FEES PAID', value: `THB ${this.toNumberString(totalFee)}`, color: '#475569' }
+    ];
 
     const content = await this.buildPdf(
-      'Transaction Report',
+      'TRANSACTION HISTORY REPORT',
       query,
       headers,
       colWidths,
-      rows
+      colAlignments,
+      rows,
+      summaryKpis
     );
 
     return {
@@ -298,14 +343,16 @@ export class ReportService {
     };
   }
 
-  // ─── PDF Builder ─────────────────────────────────────────────────────────────
+  // ─── Modern PDF Builder ──────────────────────────────────────────────────────
 
   private buildPdf(
     title: string,
     query: ReportQueryDto,
     headers: string[],
     colWidths: number[],
-    rows: string[][]
+    colAlignments: ('left' | 'right' | 'center')[],
+    rows: string[][],
+    summaryKpis?: { label: string; value: string; color: string }[]
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
@@ -330,112 +377,189 @@ export class ReportService {
         boldFont = 'ThaiFont-Bold';
       }
 
-      const pageWidth = doc.page.width - 60; // margins 30 each side
-      const primaryColor = '#1a56db';
-      const headerBg = '#1a56db';
-      const rowAlt = '#f3f6fb';
-      const borderColor = '#d1d5db';
-      const textDark = '#111827';
-      const textLight = '#ffffff';
+      const pageWidth = doc.page.width - 60; // margins 30 each side (781.89 pt)
+      const brandDark = '#0f172a';
+      const brandEmerald = '#059669';
+      const headerBg = '#064e3b'; // Dark Emerald
+      const rowAlt = '#f8fafc';
+      const borderColor = '#e2e8f0';
+      const textDark = '#1e293b';
 
-      // ─── Title block ──────────────────────────────────────────────────────
-      doc.rect(0, 0, doc.page.width, 60).fill(primaryColor);
+      // Function to render header & KPI cards on page
+      const renderHeader = (isFirstPage: boolean) => {
+        // Top Emerald Accent Strip
+        doc.rect(0, 0, doc.page.width, 4).fill(brandEmerald);
 
-      doc
-        .fillColor(textLight)
-        .font(boldFont)
-        .fontSize(18)
-        .text(title, 30, 18);
+        // Header Dark Banner
+        doc.rect(0, 4, doc.page.width, 50).fill(brandDark);
 
-      const dateRange = [
-        query.dateFrom ? `From: ${query.dateFrom}` : '',
-        query.dateTo ? `To: ${query.dateTo}` : ''
-      ]
-        .filter(Boolean)
-        .join('   ');
-
-      doc
-        .fillColor('#bfdbfe')
-        .font(regularFont)
-        .fontSize(9)
-        .text(dateRange || 'All dates', 30, 42);
-
-      doc
-        .fillColor('#bfdbfe')
-        .text(`Generated: ${new Date().toISOString().slice(0, 10)}`, { align: 'right' });
-
-      // ─── Table header ─────────────────────────────────────────────────────
-      const tableTop = 75;
-      const rowHeight = 18;
-      let startX = 30;
-
-      // Draw header cells
-      headers.forEach((header, i) => {
-        const w = colWidths[i];
-        doc.rect(startX, tableTop, w, rowHeight).fill(headerBg);
         doc
-          .fillColor(textLight)
+          .fillColor('#10b981')
           .font(boldFont)
-          .fontSize(7.5)
-          .text(header, startX + 3, tableTop + 5, { width: w - 6, ellipsis: true });
-        startX += w;
-      });
+          .fontSize(13)
+          .text('INVESTPRO', 30, 14);
 
-      // ─── Table rows ───────────────────────────────────────────────────────
+        doc
+          .fillColor('#94a3b8')
+          .font(boldFont)
+          .fontSize(8)
+          .text(title, 30, 32);
+
+        const dateRange = [
+          query.dateFrom ? `From: ${query.dateFrom}` : '',
+          query.dateTo ? `To: ${query.dateTo}` : ''
+        ]
+          .filter(Boolean)
+          .join('  |  ');
+
+        doc
+          .fillColor('#cbd5e1')
+          .font(regularFont)
+          .fontSize(8)
+          .text(`Date Range: ${dateRange || 'All Period'}`, 400, 16, { width: pageWidth - 370, align: 'right' })
+          .text(`Generated: ${new Date().toISOString().slice(0, 10)}`, 400, 30, { width: pageWidth - 370, align: 'right' });
+
+        if (isFirstPage && summaryKpis && summaryKpis.length > 0) {
+          const cardY = 62;
+          const cardHeight = 44;
+          const totalGaps = (summaryKpis.length - 1) * 10;
+          const cardWidth = (pageWidth - totalGaps) / summaryKpis.length;
+
+          summaryKpis.forEach((kpi, idx) => {
+            const cardX = 30 + idx * (cardWidth + 10);
+
+            // Card background & border
+            doc
+              .roundedRect(cardX, cardY, cardWidth, cardHeight, 6)
+              .fillAndStroke('#f8fafc', '#e2e8f0');
+
+            // KPI Label
+            doc
+              .fillColor('#64748b')
+              .font(boldFont)
+              .fontSize(7)
+              .text(kpi.label, cardX + 8, cardY + 8, { width: cardWidth - 16 });
+
+            // KPI Value
+            doc
+              .fillColor(kpi.color)
+              .font(boldFont)
+              .fontSize(11)
+              .text(kpi.value, cardX + 8, cardY + 22, { width: cardWidth - 16 });
+          });
+        }
+      };
+
+      // Render Header on Page 1
+      renderHeader(true);
+
+      const tableTop = summaryKpis && summaryKpis.length > 0 ? 116 : 64;
+      const rowHeight = 20;
+
+      // Function to render table column headers
+      const renderTableHeaders = (startY: number) => {
+        let hx = 30;
+        headers.forEach((header, i) => {
+          const w = colWidths[i];
+          const align = colAlignments[i] || 'left';
+          doc.rect(hx, startY, w, rowHeight).fill(headerBg);
+          doc
+            .fillColor('#ffffff')
+            .font(boldFont)
+            .fontSize(7.5)
+            .text(header, hx + 4, startY + 6, {
+              width: w - 8,
+              align,
+              ellipsis: true
+            });
+          hx += w;
+        });
+      };
+
+      renderTableHeaders(tableTop);
+
+      let currentY = tableTop + rowHeight;
+
+      // Render Table Rows
       rows.forEach((row, rowIdx) => {
-        const y = tableTop + rowHeight + rowIdx * rowHeight;
+        // Auto Page Break if approaching page bottom
+        if (currentY + rowHeight > doc.page.height - 40) {
+          doc.addPage({ margin: 30, size: 'A4', layout: 'landscape' });
+          renderHeader(false);
+          renderTableHeaders(64);
+          currentY = 64 + rowHeight;
+        }
 
         // Alternate row background
         if (rowIdx % 2 === 1) {
-          doc.rect(30, y, pageWidth, rowHeight).fill(rowAlt);
+          doc.rect(30, currentY, pageWidth, rowHeight).fill(rowAlt);
         }
 
-        // Row border bottom
-        doc.moveTo(30, y + rowHeight).lineTo(30 + pageWidth, y + rowHeight)
-          .strokeColor(borderColor).lineWidth(0.5).stroke();
+        // Row bottom border line
+        doc
+          .moveTo(30, currentY + rowHeight)
+          .lineTo(30 + pageWidth, currentY + rowHeight)
+          .strokeColor(borderColor)
+          .lineWidth(0.5)
+          .stroke();
 
         let x = 30;
         row.forEach((cell, colIdx) => {
+          const w = colWidths[colIdx];
+          const align = colAlignments[colIdx] || 'left';
+
+          // Color coding for profit / loss cells
+          let cellColor = textDark;
+          let fontToUse = regularFont;
+
+          if (cell.startsWith('+')) {
+            cellColor = '#059669'; // Emerald Green
+            fontToUse = boldFont;
+          } else if (cell.startsWith('-') && cell !== '-') {
+            cellColor = '#dc2626'; // Crimson Red
+            fontToUse = boldFont;
+          }
+
           doc
-            .fillColor(textDark)
-            .font(regularFont)
+            .fillColor(cellColor)
+            .font(fontToUse)
             .fontSize(7.5)
-            .text(cell, x + 3, y + 5, {
-              width: colWidths[colIdx] - 6,
+            .text(cell, x + 4, currentY + 6, {
+              width: w - 8,
+              align,
               ellipsis: true
             });
-          x += colWidths[colIdx];
+
+          x += w;
         });
 
-        // Auto page break
-        if (y + rowHeight * 2 > doc.page.height - 40) {
-          doc.addPage({ margin: 30, size: 'A4', layout: 'landscape' });
-          // Redraw header on new page
-          let hx = 30;
-          headers.forEach((header, i) => {
-            const w = colWidths[i];
-            doc.rect(hx, 30, w, rowHeight).fill(headerBg);
-            doc
-              .fillColor(textLight)
-              .font(boldFont)
-              .fontSize(7.5)
-              .text(header, hx + 3, 35, { width: w - 6, ellipsis: true });
-            hx += w;
-          });
-        }
+        currentY += rowHeight;
       });
 
-      // ─── Summary footer ───────────────────────────────────────────────────
-      const footerY = doc.page.height - 30;
-      doc
-        .fillColor('#6b7280')
-        .font(regularFont)
-        .fontSize(8)
-        .text(`Total records: ${rows.length}`, 30, footerY)
-        .text('Investment Portfolio Management System', 0, footerY, {
-          align: 'right',
-          width: doc.page.width - 30
-        });
+      // Add Page Numbers & Footer Watermark on all pages
+      const pages = doc.bufferedPageRange();
+      for (let i = 0; i < pages.count; i++) {
+        doc.switchToPage(i);
+        const footerY = doc.page.height - 25;
+
+        // Footer Border Line
+        doc
+          .moveTo(30, footerY - 5)
+          .lineTo(doc.page.width - 30, footerY - 5)
+          .strokeColor('#cbd5e1')
+          .lineWidth(0.5)
+          .stroke();
+
+        doc
+          .fillColor('#64748b')
+          .font(regularFont)
+          .fontSize(7.5)
+          .text('InvestPro Portfolio Management System • Confidential Financial Statement', 30, footerY)
+          .text(`Page ${i + 1} of ${pages.count}`, 0, footerY, {
+            align: 'right',
+            width: doc.page.width - 30
+          });
+      }
 
       doc.end();
     });

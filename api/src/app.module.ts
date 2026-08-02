@@ -20,6 +20,7 @@ import { NotificationModule } from './notification/notification.module';
 import { AnnouncementModule } from './announcement/announcement.module';
 import { ReportModule } from './report/report.module';
 import { AdminModule } from './admin/admin.module';
+import { UploadModule } from '@/infrastructure/upload/upload.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { AdminModule } from './admin/admin.module';
     NotificationModule,
     AnnouncementModule,
     ReportModule,
-    AdminModule
+    AdminModule,
+    UploadModule
   ],
   providers: [
     // 1. AccessTokenGuard: ทำงานก่อน — ตรวจว่า JWT Token ถูกต้องไหม

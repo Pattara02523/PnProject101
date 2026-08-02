@@ -7,7 +7,8 @@ import {
   IsOptional,
   IsString,
   Matches,
-  MinLength
+  MinLength,
+  ValidateIf
 } from 'class-validator';
 
 export class RegisterDto {
@@ -38,9 +39,9 @@ export class RegisterDto {
 
   @ApiPropertyOptional({ example: '0812345678', description: 'User Phone Number (10 digits)' })
   @IsOptional()
+  @ValidateIf((o) => o.phone !== undefined && o.phone !== null && o.phone !== '')
   @Trim()
   @IsString()
-  @IsNotEmpty()
   @Matches(/^[0-9]{10}$/, {
     message: 'Phone number must be 10 digits (เบอร์โทรศัพท์ต้องมีตัวเลข 10 หลัก)'
   })
