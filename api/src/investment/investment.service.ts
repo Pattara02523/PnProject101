@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InvestmentWhereInput } from '@/database/generated/prisma/models';
-import { TransactionType } from '@/database/generated/prisma/enums';
+import { TransactionType, ActivityAction } from '@/database/generated/prisma/enums';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateInvestmentDto } from './dto/create-investment.dto';
 import { UpdateInvestmentDto } from './dto/update-investment.dto';
@@ -18,10 +18,7 @@ export class InvestmentService {
     userId: string,
     dto: CreateInvestmentDto
   ): Promise<InvestmentResponseDto> {
-    // ตรวจว่าพอร์ตการลงทุนเป็นของผู้ใช้คนปัจจุบัน
     await this.verifyPortfolioOwnership(userId, dto.portfolioId);
-
-    // ตรวจว่าหมวดหมู่เป็นของผู้ใช้คนปัจจุบัน
     await this.verifyCategoryOwnership(userId, dto.categoryId);
 
     return this.prisma.$transaction(async (tx) => {
@@ -46,6 +43,16 @@ export class InvestmentService {
         });
       }
 
+      await tx.activityLog.create({
+        data: {
+          userId,
+          action: ActivityAction.CREATE,
+          module: 'INVESTMENT',
+          entityId: investment.id,
+          description: `Created investment "${investment.assetName}" (${investment.symbol})`
+        }
+      });
+
       return investment;
     });
   }
@@ -69,7 +76,6 @@ export class InvestmentService {
 
     const skip = (page - 1) * limit;
 
-    // กรองให้เหลือเฉพาะรายการลงทุนในพอร์ตของผู้ใช้
     const where: InvestmentWhereInput = {
       portfolio: { userId },
       ...(portfolioId && { portfolioId }),
@@ -144,17 +150,15 @@ export class InvestmentService {
   ): Promise<InvestmentResponseDto> {
     await this.findOne(userId, id);
 
-    // เมื่อต้องย้ายพอร์ต ต้องตรวจว่าพอร์ตปลายทางเป็นของผู้ใช้
     if (dto.portfolioId) {
       await this.verifyPortfolioOwnership(userId, dto.portfolioId);
     }
 
-    // เมื่อเปลี่ยนหมวดหมู่ ต้องตรวจว่าหมวดหมู่เป็นของผู้ใช้
     if (dto.categoryId) {
       await this.verifyCategoryOwnership(userId, dto.categoryId);
     }
 
-    return this.prisma.investment.update({
+    const updated = await this.prisma.investment.update({
       where: { id },
       data: {
         ...dto,
@@ -163,15 +167,35 @@ export class InvestmentService {
         })
       }
     });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.UPDATE,
+        module: 'INVESTMENT',
+        entityId: updated.id,
+        description: `Updated investment "${updated.assetName}"`
+      }
+    });
+
+    return updated;
   }
 
   async delete(userId: string, id: string): Promise<void> {
-    await this.findOne(userId, id);
+    const investment = await this.findOne(userId, id);
 
     await this.prisma.investment.delete({ where: { id } });
-  }
 
-  // เมธอดช่วยตรวจสอบความเป็นเจ้าของข้อมูล
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.DELETE,
+        module: 'INVESTMENT',
+        entityId: id,
+        description: `Deleted investment "${investment.assetName}"`
+      }
+    });
+  }
 
   private async verifyPortfolioOwnership(
     userId: string,

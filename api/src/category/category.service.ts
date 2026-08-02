@@ -4,6 +4,7 @@ import {
   BadRequestException
 } from '@nestjs/common';
 import { PrismaService } from '@/database/prisma.service';
+import { ActivityAction } from '@/database/generated/prisma/enums';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryResponseDto } from './dto/category-response.dto';
@@ -17,12 +18,24 @@ export class CategoryService {
     userId: string,
     dto: CreateCategoryDto
   ): Promise<CategoryResponseDto> {
-    return this.prisma.category.create({
+    const category = await this.prisma.category.create({
       data: {
         ...dto,
         userId
       }
     });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.CREATE,
+        module: 'CATEGORY',
+        entityId: category.id,
+        description: `Created category "${category.name}"`
+      }
+    });
+
+    return category;
   }
 
   async findAll(userId: string): Promise<CategoryResponseDto[]> {
@@ -61,17 +74,27 @@ export class CategoryService {
   ): Promise<CategoryResponseDto> {
     await this.findOne(userId, id);
 
-    return this.prisma.category.update({
+    const updated = await this.prisma.category.update({
       where: { id },
       data: dto
     });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.UPDATE,
+        module: 'CATEGORY',
+        entityId: updated.id,
+        description: `Updated category "${updated.name}"`
+      }
+    });
+
+    return updated;
   }
 
   async delete(userId: string, id: string): Promise<void> {
-    // 1. ตรวจสอบว่ามี Category อยู่ในระบบของ User หรือไม่
-    await this.findOne(userId, id);
+    const category = await this.findOne(userId, id);
 
-    // 2. ตรวจสอบการใช้งานล่วงหน้าก่อนลบ (Restrict pattern)
     const inUse = await this.prisma.investment.findFirst({
       where: { categoryId: id },
       select: { id: true }
@@ -83,10 +106,19 @@ export class CategoryService {
       );
     }
 
-    // 3. ทำการลบโดยมี Try-Catch ป้องกัน Foreign Key Violation (P2003)
     try {
       await this.prisma.category.delete({
         where: { id }
+      });
+
+      await this.prisma.activityLog.create({
+        data: {
+          userId,
+          action: ActivityAction.DELETE,
+          module: 'CATEGORY',
+          entityId: id,
+          description: `Deleted category "${category.name}"`
+        }
       });
     } catch (error) {
       if (

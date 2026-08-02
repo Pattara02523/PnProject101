@@ -6,7 +6,8 @@ import {
 import { Prisma } from '@/database/generated/prisma/client';
 import {
   InvestmentStatus,
-  TransactionType
+  TransactionType,
+  ActivityAction
 } from '@/database/generated/prisma/enums';
 import { TransactionWhereInput } from '@/database/generated/prisma/models';
 import { PrismaService } from '@/database/prisma.service';
@@ -35,7 +36,6 @@ export class TransactionService {
         dto.investmentId
       );
 
-      // Business Rule: ห้ามซื้อเพิ่มหลัง SOLD (ต้องสร้าง investment ใหม่แทน)
       if (
         dto.type === TransactionType.BUY &&
         investment.status === InvestmentStatus.SOLD
@@ -46,7 +46,6 @@ export class TransactionService {
       }
 
       if (dto.type === TransactionType.SELL) {
-        // Business Rule: ห้าม SELL ถ้า investment.status = SOLD อยู่แล้ว
         if (investment.status === InvestmentStatus.SOLD) {
           throw new BadRequestException(
             'Cannot sell because this investment has already been sold out (ไม่สามารถขายได้ เพราะรายการลงทุนนี้ถูกขายออกทั้งหมดแล้ว)'
@@ -63,8 +62,18 @@ export class TransactionService {
         }
       });
 
-      // บันทึกธุรกรรมและยอดสรุปการลงทุนต้องสำเร็จหรือล้มเหลวพร้อมกัน
       await this.recalculateInvestmentSummary(tx, dto.investmentId);
+
+      await tx.activityLog.create({
+        data: {
+          userId,
+          action: ActivityAction.CREATE,
+          module: 'TRANSACTION',
+          entityId: transaction.id,
+          description: `Created ${dto.type} transaction (amount: ฿${dto.amount})`
+        }
+      });
+
       return transaction;
     });
   }
@@ -146,7 +155,6 @@ export class TransactionService {
 
       this.validateTradeFields(type, quantity, price);
 
-
       if (type === TransactionType.SELL) {
         const previousSellQuantity =
           existing.type === TransactionType.SELL
@@ -172,6 +180,17 @@ export class TransactionService {
       });
 
       await this.recalculateInvestmentSummary(tx, existing.investmentId);
+
+      await tx.activityLog.create({
+        data: {
+          userId,
+          action: ActivityAction.UPDATE,
+          module: 'TRANSACTION',
+          entityId: updated.id,
+          description: `Updated ${updated.type} transaction`
+        }
+      });
+
       return updated;
     });
   }
@@ -182,6 +201,16 @@ export class TransactionService {
 
       await tx.transaction.delete({ where: { id } });
       await this.recalculateInvestmentSummary(tx, existing.investmentId);
+
+      await tx.activityLog.create({
+        data: {
+          userId,
+          action: ActivityAction.DELETE,
+          module: 'TRANSACTION',
+          entityId: id,
+          description: `Deleted ${existing.type} transaction`
+        }
+      });
     });
   }
 
@@ -200,7 +229,6 @@ export class TransactionService {
     }
   }
 
-  // คืนค่า investment เพื่อให้ caller ตรวจ status ได้
   private async verifyInvestmentOwnership(
     prisma: Prisma.TransactionClient,
     userId: string,
@@ -244,7 +272,6 @@ export class TransactionService {
     }
   }
 
-  // คำนวณยอดคงเหลือและต้นทุนเฉลี่ยจากประวัติธุรกรรมตามลำดับเวลา
   private async recalculateInvestmentSummary(
     prisma: Prisma.TransactionClient,
     investmentId: string
@@ -260,7 +287,6 @@ export class TransactionService {
         transaction.type === TransactionType.SELL
     );
 
-    // DIVIDEND, DEPOSIT และ WITHDRAW ไม่ควรล้างยอดลงทุนที่สร้างไว้เดิม
     if (!hasTrade) {
       return;
     }

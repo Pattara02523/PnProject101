@@ -3,11 +3,9 @@ import {
   NotFoundException,
   UnauthorizedException
 } from '@nestjs/common';
-
 import { BcryptService } from '@/infrastructure/hash/bcrypt.service';
-
+import { ActivityAction } from '@/database/generated/prisma/enums';
 import { PrismaService } from '@/database/prisma.service';
-
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserResponseDto } from './dto/user-response.dto';
@@ -38,11 +36,23 @@ export class UserService {
   ): Promise<UserResponseDto> {
     await this.ensureUserExists(userId);
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: userId },
       data: dto,
       select: this.safeUserSelect()
     });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.UPDATE,
+        module: 'USER',
+        entityId: userId,
+        description: 'Updated profile information'
+      }
+    });
+
+    return updated;
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
@@ -73,6 +83,16 @@ export class UserService {
       where: { id: userId },
       data: { password: hashedPassword },
       select: { id: true }
+    });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.UPDATE,
+        module: 'USER',
+        entityId: userId,
+        description: 'Changed user password'
+      }
     });
   }
 

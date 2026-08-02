@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GoalStatus, NotificationType } from '@/database/generated/prisma/enums';
+import { GoalStatus, NotificationType, ActivityAction } from '@/database/generated/prisma/enums';
 import { Goal } from '@/database/generated/prisma/client';
 import { PrismaService } from '@/database/prisma.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
@@ -10,16 +10,12 @@ import { GoalResponseDto } from './dto/goal-response.dto';
 export class GoalService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /**
-   * สร้างเป้าหมายทางการเงินใหม่
-   */
   async create(userId: string, dto: CreateGoalDto): Promise<GoalResponseDto> {
     const currentAmount = dto.currentAmount ?? 0;
     const targetAmount = dto.targetAmount;
     const deadlineDate = new Date(dto.deadline);
     const now = new Date();
 
-    // ประเมินสถานะเริ่มต้นอัตโนมัติ
     let status: GoalStatus = GoalStatus.IN_PROGRESS;
     if (currentAmount >= targetAmount) {
       status = GoalStatus.COMPLETED;
@@ -48,12 +44,19 @@ export class GoalService {
       targetAmount
     );
 
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.CREATE,
+        module: 'GOAL',
+        entityId: goal.id,
+        description: `Created financial goal "${goal.title}"`
+      }
+    });
+
     return this.formatGoalResponse(goal);
   }
 
-  /**
-   * ดึงรายการเป้าหมายทั้งหมดของผู้ใช้
-   */
   async findAll(userId: string): Promise<GoalResponseDto[]> {
     const goals = await this.prisma.goal.findMany({
       where: { userId },
@@ -63,9 +66,6 @@ export class GoalService {
     return goals.map((goal) => this.formatGoalResponse(goal));
   }
 
-  /**
-   * ดึงรายละเอียดเป้าหมายเดี่ยวตาม ID
-   */
   async findOne(userId: string, id: string): Promise<GoalResponseDto> {
     const goal = await this.prisma.goal.findFirst({
       where: { id, userId }
@@ -78,9 +78,6 @@ export class GoalService {
     return this.formatGoalResponse(goal);
   }
 
-  /**
-   * แก้ไขเป้าหมาย และคำนวณสถานะ + % ความคืบหน้าใหม่อัตโนมัติ
-   */
   async update(
     userId: string,
     id: string,
@@ -95,7 +92,6 @@ export class GoalService {
       : existing.deadline;
     const now = new Date();
 
-    // คำนวณสถานะใหม่อัตโนมัติ (หากไม่ได้ระบุ status มาตรงๆ)
     let status: GoalStatus = dto.status ?? existing.status;
     if (!dto.status) {
       if (currentAmount >= targetAmount) {
@@ -132,30 +128,41 @@ export class GoalService {
       Number(updated.targetAmount)
     );
 
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.UPDATE,
+        module: 'GOAL',
+        entityId: updated.id,
+        description: `Updated financial goal "${updated.title}"`
+      }
+    });
+
     return this.formatGoalResponse(updated);
   }
 
-  /**
-   * ลบเป้าหมาย
-   */
   async delete(userId: string, id: string): Promise<void> {
-    await this.findOne(userId, id);
+    const goal = await this.findOne(userId, id);
 
     await this.prisma.goal.delete({
       where: { id }
     });
+
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: ActivityAction.DELETE,
+        module: 'GOAL',
+        entityId: id,
+        description: `Deleted financial goal "${goal.title}"`
+      }
+    });
   }
 
-  // ── Helper Function ────────────────────────────────────────────
-
-  /**
-   * คำนวณ % ความคืบหน้า (Progress Percentage) และจัดฟอร์แมตข้อมูลส่งออก
-   */
   private formatGoalResponse(goal: Goal): GoalResponseDto {
     const target = Number(goal.targetAmount);
     const current = Number(goal.currentAmount);
 
-    // คำนวณ % ความคืบหน้า (ทศนิยม 2 ตำแหน่ง ไม่เกิน 100%)
     const progressPercentage =
       target > 0
         ? Math.min(100, Number(((current / target) * 100).toFixed(2)))
